@@ -13,6 +13,7 @@ ExpoGo --> Paramètre --> Client Version
 
 Check la version de expo dans le package.json et package-lock.json et la mettre à jour si besoin
 ```json
+//package-lock.json
 "packages": {
     "": {
       "name": "sadisticaim",
@@ -23,7 +24,7 @@ Check la version de expo dans le package.json et package-lock.json et la mettre 
         "react": "19.2.0",
         "react-native": "0.83.4"
       }
-
+//package.json
 "dependencies": {
   "expo": "{VERSION}",
   "expo-status-bar": "~55.0.4",
