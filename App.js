@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableWithoutFeedback, Dimensions, Alert } from 'react-native';
-import { useGyroscope } from './src/hooks/useGyroscope';
-import ClickBar from './src/components/ClickBar';
-import BoostBar from './src/components/BoostBar';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  Dimensions,
+  Alert,
+} from "react-native";
+import { useGyroscope } from "./src/hooks/useGyroscope";
+import ClickBar from "./src/components/ClickBar";
+import BoostBar from "./src/components/BoostBar";
 
-const { width: SCREEN_W } = Dimensions.get('window');
+const { width: SCREEN_W } = Dimensions.get("window");
 const ZONE_W = SCREEN_W - 40;
 const ZONE_H = ZONE_W / 4;
 const TARGET_W = 50;
@@ -77,8 +83,11 @@ export default function App() {
     }
     const sweetX = targetX + (TARGET_W - SWEET_W) / 2;
     const sweetY = (ZONE_H - SWEET_H) / 2;
-    const onSweet = cursorX >= sweetX && cursorX <= sweetX + SWEET_W
-      && cursorY >= sweetY && cursorY <= sweetY + SWEET_H;
+    const onSweet =
+      cursorX >= sweetX &&
+      cursorX <= sweetX + SWEET_W &&
+      cursorY >= sweetY &&
+      cursorY <= sweetY + SWEET_H;
 
     const gain = onSweet ? BOOST_SWEET : BOOST_HIT;
     const newBoost = Math.min(BOOST_MAX, boost + gain);
@@ -86,39 +95,67 @@ export default function App() {
 
     if (newBoost >= BOOST_MAX) {
       setWon(true);
-      Alert.alert('Victoire !', 'Boost au maximum !', [
-        { text: 'Rejouer', onPress: () => { setBoost(0); setWon(false); } },
+      Alert.alert("Victoire !", "Boost au maximum !", [
+        {
+          text: "Rejouer",
+          onPress: () => {
+            setBoost(0);
+            setWon(false);
+          },
+        },
       ]);
     }
   }, [cursorX, cursorY, targetX, boost, won]);
 
   return (
     <TouchableWithoutFeedback onPress={handleTap}>
-      <View style={{ flex: 1, backgroundColor: '#1a1a2e', justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: '#fff', fontSize: 24, marginBottom: 30 }}>SadisticAim</Text>
-        <View style={{ width: ZONE_W, height: ZONE_H, borderWidth: 1, borderColor: '#444', overflow: 'visible' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#1a1a2e",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: 24, marginBottom: 30 }}>
+          SadisticAim
+        </Text>
+        <View
+          style={{
+            width: ZONE_W,
+            height: ZONE_H,
+            borderWidth: 1,
+            borderColor: "#444",
+            overflow: "visible",
+          }}
+        >
           <View
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: targetX,
               top: 0,
               width: TARGET_W,
               height: ZONE_H,
-              backgroundColor: '#FF4444',
+              backgroundColor: "#FF4444",
             }}
           >
             <View
               style={{
-                position: 'absolute',
+                position: "absolute",
                 left: (TARGET_W - SWEET_W) / 2,
                 top: (ZONE_H - SWEET_H) / 2,
                 width: SWEET_W,
                 height: SWEET_H,
-                backgroundColor: '#FFD700',
+                backgroundColor: "#FFD700",
               }}
             />
           </View>
-          <ClickBar cursorX={cursorX} cursorY={cursorY} zoneW={ZONE_W} zoneH={ZONE_H} />
+          <ClickBar
+            cursorX={cursorX}
+            cursorY={cursorY}
+            zoneW={ZONE_W}
+            zoneH={ZONE_H}
+          />
         </View>
 
         <BoostBar value={boost} max={BOOST_MAX} />
