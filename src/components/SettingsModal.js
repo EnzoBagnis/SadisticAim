@@ -1,18 +1,20 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { useGame } from '../context/GameContext';
 
-export default function SettingsModal({
-  visible,
-  onClose,
-  musicVolume,
-  onMusicVolumeChange,
-  soundVolume,
-  onSoundVolumeChange,
-  onRecalibrate,
-}) {
+export default function SettingsModal() {
+  const {
+    settings,
+    settingsVisible,
+    setMusicVolume,
+    setSoundVolume,
+    recalibrate,
+    closeSettings,
+  } = useGame();
+
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={settingsVisible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>Paramètres</Text>
@@ -20,15 +22,15 @@ export default function SettingsModal({
           <View style={styles.sliderGroup}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>Musique</Text>
-              <Text style={styles.value}>{Math.round(musicVolume * 100)}%</Text>
+              <Text style={styles.value}>{Math.round(settings.musicVolume * 100)}%</Text>
             </View>
             <Slider
               style={styles.slider}
               minimumValue={0}
               maximumValue={1}
               step={0.01}
-              value={musicVolume}
-              onValueChange={onMusicVolumeChange}
+              value={settings.musicVolume}
+              onValueChange={setMusicVolume}
               minimumTrackTintColor="#4CAF50"
               maximumTrackTintColor="#555"
               thumbTintColor="#fff"
@@ -38,26 +40,26 @@ export default function SettingsModal({
           <View style={styles.sliderGroup}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>Sons</Text>
-              <Text style={styles.value}>{Math.round(soundVolume * 100)}%</Text>
+              <Text style={styles.value}>{Math.round(settings.soundVolume * 100)}%</Text>
             </View>
             <Slider
               style={styles.slider}
               minimumValue={0}
               maximumValue={1}
               step={0.01}
-              value={soundVolume}
-              onValueChange={onSoundVolumeChange}
+              value={settings.soundVolume}
+              onValueChange={setSoundVolume}
               minimumTrackTintColor="#4CAF50"
               maximumTrackTintColor="#555"
               thumbTintColor="#fff"
             />
           </View>
 
-          <TouchableOpacity style={styles.calibrateBtn} onPress={onRecalibrate}>
+          <TouchableOpacity style={styles.calibrateBtn} onPress={recalibrate}>
             <Text style={styles.calibrateTxt}>Recalibrer le gyroscope</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <TouchableOpacity style={styles.closeBtn} onPress={closeSettings}>
             <Text style={styles.closeTxt}>Fermer</Text>
           </TouchableOpacity>
         </View>

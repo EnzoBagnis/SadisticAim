@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { useGame } from '../context/GameContext';
 
-export default function BoostBar({ value, max }) {
-  const percentage = Math.min(100, (value / max) * 100);
+export default function BoostBar() {
+  const { boost, config } = useGame();
+  const percentage = Math.min(100, (boost / config.BOOST_MAX) * 100);
 
   return (
     <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
