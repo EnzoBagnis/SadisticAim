@@ -25,7 +25,7 @@ const DIRECTION_CHANGE_MS = 1200;
 export default function App() {
   const gyro = useGyroscope();
   const { settings, loaded, update } = useSettings();
-  const audio = useAudio(loaded, settings.musicEnabled, settings.soundEnabled);
+  const audio = useAudio(loaded, settings.musicVolume, settings.soundVolume);
   const [boost, setBoost] = useState(0);
   const [won, setWon] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
@@ -101,14 +101,14 @@ export default function App() {
     }
   }, [cursorX, cursorY, targetX, boost, won, settingsVisible, audio]);
 
-  const handleMusicToggle = useCallback((val) => {
-    update('musicEnabled', val);
-    audio.setMusicEnabled(val);
+  const handleMusicVolume = useCallback((val) => {
+    update('musicVolume', val);
+    audio.setMusicVolume(val);
   }, [audio, update]);
 
-  const handleSoundToggle = useCallback((val) => {
-    update('soundEnabled', val);
-    audio.setSoundEnabled(val);
+  const handleSoundVolume = useCallback((val) => {
+    update('soundVolume', val);
+    audio.setSoundVolume(val);
   }, [audio, update]);
 
   const handleRecalibrate = useCallback(() => {
@@ -157,10 +157,10 @@ export default function App() {
         <SettingsModal
           visible={settingsVisible}
           onClose={() => setSettingsVisible(false)}
-          musicEnabled={settings.musicEnabled}
-          onMusicToggle={handleMusicToggle}
-          soundEnabled={settings.soundEnabled}
-          onSoundToggle={handleSoundToggle}
+          musicVolume={settings.musicVolume}
+          onMusicVolumeChange={handleMusicVolume}
+          soundVolume={settings.soundVolume}
+          onSoundVolumeChange={handleSoundVolume}
           onRecalibrate={handleRecalibrate}
         />
       </View>
