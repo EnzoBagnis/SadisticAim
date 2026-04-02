@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Gyroscope } from 'expo-sensors';
 
 const SENSITIVITY = 150;
@@ -6,6 +6,11 @@ const SENSITIVITY = 150;
 export function useGyroscope() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const ref = useRef({ x: 0, y: 0 });
+
+  const recalibrate = useCallback(() => {
+    ref.current = { x: 0, y: 0 };
+    setPos({ x: 0, y: 0 });
+  }, []);
 
   useEffect(() => {
     Gyroscope.setUpdateInterval(16);
@@ -21,5 +26,5 @@ export function useGyroscope() {
     return () => subscription.remove();
   }, []);
 
-  return pos;
+  return { ...pos, recalibrate };
 }

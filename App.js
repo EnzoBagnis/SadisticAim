@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableWithoutFeedback, Dimensions, Alert } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { useGyroscope } from './src/hooks/useGyroscope';
+import { useAudio } from './src/hooks/useAudio';
+import { useSettings } from './src/hooks/useSettings';
 import ClickBar from './src/components/ClickBar';
 import BoostBar from './src/components/BoostBar';
+import SettingsModal from './src/components/SettingsModal';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const ZONE_W = SCREEN_W - 40;
@@ -21,8 +24,11 @@ const DIRECTION_CHANGE_MS = 1200;
 
 export default function App() {
   const gyro = useGyroscope();
+  const { settings, loaded, update } = useSettings();
+  const audio = useAudio(loaded, settings.musicEnabled, settings.soundEnabled);
   const [boost, setBoost] = useState(0);
   const [won, setWon] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const [targetX, setTargetX] = useState(ZONE_W / 2 - TARGET_W / 2);
   const targetXRef = useRef(ZONE_W / 2 - TARGET_W / 2);
@@ -66,15 +72,18 @@ export default function App() {
   }, [won]);
 
   const handleTap = useCallback(() => {
-    if (won) return;
+    if (won || settingsVisible) return;
 
     const onTargetX = cursorX >= targetX && cursorX <= targetX + TARGET_W;
     const onTargetY = cursorY >= 0 && cursorY <= ZONE_H;
 
     if (!onTargetX || !onTargetY) {
+      audio.playMiss();
       setBoost((b) => Math.max(0, b + BOOST_MISS));
       return;
     }
+
+    audio.playClick();
     const sweetX = targetX + (TARGET_W - SWEET_W) / 2;
     const sweetY = (ZONE_H - SWEET_H) / 2;
     const onSweet = cursorX >= sweetX && cursorX <= sweetX + SWEET_W
@@ -90,11 +99,33 @@ export default function App() {
         { text: 'Rejouer', onPress: () => { setBoost(0); setWon(false); } },
       ]);
     }
-  }, [cursorX, cursorY, targetX, boost, won]);
+  }, [cursorX, cursorY, targetX, boost, won, settingsVisible, audio]);
+
+  const handleMusicToggle = useCallback((val) => {
+    update('musicEnabled', val);
+    audio.setMusicEnabled(val);
+  }, [audio, update]);
+
+  const handleSoundToggle = useCallback((val) => {
+    update('soundEnabled', val);
+    audio.setSoundEnabled(val);
+  }, [audio, update]);
+
+  const handleRecalibrate = useCallback(() => {
+    gyro.recalibrate();
+  }, [gyro]);
 
   return (
     <TouchableWithoutFeedback onPress={handleTap}>
       <View style={{ flex: 1, backgroundColor: '#1a1a2e', justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={styles.settingsBtn}
+          onPress={() => setSettingsVisible(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.settingsIcon}>⚙</Text>
+        </TouchableOpacity>
+
         <Text style={{ color: '#fff', fontSize: 24, marginBottom: 30 }}>SadisticAim</Text>
         <View style={{ width: ZONE_W, height: ZONE_H, borderWidth: 1, borderColor: '#444', overflow: 'visible' }}>
           <View
@@ -122,7 +153,36 @@ export default function App() {
         </View>
 
         <BoostBar value={boost} max={BOOST_MAX} />
+
+        <SettingsModal
+          visible={settingsVisible}
+          onClose={() => setSettingsVisible(false)}
+          musicEnabled={settings.musicEnabled}
+          onMusicToggle={handleMusicToggle}
+          soundEnabled={settings.soundEnabled}
+          onSoundToggle={handleSoundToggle}
+          onRecalibrate={handleRecalibrate}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
 }
+
+const styles = {
+  settingsBtn: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsIcon: {
+    fontSize: 24,
+    color: '#fff',
+  },
+};
