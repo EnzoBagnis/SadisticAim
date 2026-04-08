@@ -4,26 +4,33 @@ import { SHOP_ITEMS, getShopPrice } from "../BaseVar";
 
 export default function Shop({ points = 0, levels = {}, onBuy }) {
   return (
-    <View style={{ width: "100%", maxHeight: 280, marginTop: 18 }}>
-      <Text
-        style={{
-          color: "#fff",
-          fontSize: 20,
-          fontWeight: "700",
-          marginBottom: 10,
-        }}
-      >
-        Shop
-      </Text>
-      <Text style={{ color: "#9fb1c9", marginBottom: 12 }}>
-        Points disponibles : {points}
-      </Text>
+    <View style={{ width: "100%", height: 350, marginTop: 15, paddingHorizontal: 5 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 10 }}>
+        <Text
+          style={{
+            color: "#00ffff",
+            fontSize: 22,
+            fontWeight: "900",
+            textTransform: 'uppercase',
+            letterSpacing: 2,
+            textShadowColor: "#00ffff",
+            textShadowOffset: { width: 0, height: 0 },
+            textShadowOpacity: 0.8,
+            textShadowRadius: 8,
+          }}
+        >
+          Terminal QG
+        </Text>
+        <Text style={{ color: "#d0d0e0", fontSize: 14, fontWeight: 'bold' }}>
+          Crédits : <Text style={{ color: '#00ff66' }}>{points}</Text>
+        </Text>
+      </View>
 
         <ScrollView
             nestedScrollEnabled
             keyboardShouldPersistTaps="handled"
-            style={{ backgroundColor: "#0f1723", borderRadius: 10 }}
-            contentContainerStyle={{ padding: 12, gap: 10 }}
+            style={{ backgroundColor: "rgba(20,20,35,0.7)", borderRadius: 12, borderWidth: 1, borderColor: '#333' }}
+            contentContainerStyle={{ padding: 15, gap: 15 }}
             showsVerticalScrollIndicator={false}
         >
 
@@ -39,28 +46,32 @@ export default function Shop({ points = 0, levels = {}, onBuy }) {
               style={{
                 borderRadius: 10,
                 borderWidth: 1,
-                borderColor: "#263245",
-                padding: 12,
-                backgroundColor: "#121b2b",
+                borderColor: isMaxed ? "#333" : canBuy ? "#00ffff" : "#444",
+                padding: 15,
+                backgroundColor: "rgba(0,0,0,0.6)",
+                shadowColor: canBuy && !isMaxed ? "#00ffff" : "transparent",
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
               }}
             >
-              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+              <Text style={{ color: "#fff", fontWeight: "900", fontSize: 16, textTransform: 'uppercase', letterSpacing: 1 }}>
                 {item.title}
               </Text>
-              <Text style={{ color: "#9fb1c9", marginTop: 4 }}>
+              <Text style={{ color: "#a0a0b0", marginTop: 6, fontStyle: 'italic', fontSize: 13 }}>
                 {item.description}
               </Text>
 
               <View
                 style={{
-                  marginTop: 10,
+                  marginTop: 15,
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
               >
-                <Text style={{ color: "#d4e2f5" }}>
-                  Niveau: {level}/{item.maxLevel}
+                <Text style={{ color: "#d0d0e0", fontWeight: 'bold' }}>
+                  Niveau {level} <Text style={{ color: '#555' }}>/ {item.maxLevel}</Text>
                 </Text>
 
                 <Pressable
@@ -68,17 +79,22 @@ export default function Shop({ points = 0, levels = {}, onBuy }) {
                   onPress={() => onBuy?.(item.id, price)}
                   style={{
                     backgroundColor: isMaxed
-                      ? "#4b5563"
+                      ? "rgba(255,255,255,0.1)"
                       : canBuy
-                        ? "#16a34a"
-                        : "#b91c1c",
+                        ? "rgba(0,255,102,0.2)"
+                        : "rgba(255,68,68,0.2)",
                     borderRadius: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
+                    paddingHorizontal: 15,
+                    paddingVertical: 10,
+                    borderWidth: 1,
+                    borderColor: isMaxed ? "#555" : canBuy ? "#00ff66" : "#ff4444",
                   }}
                 >
-                  <Text style={{ color: "#fff", fontWeight: "700" }}>
-                    {isMaxed ? "MAX" : `Acheter (${price})`}
+                  <Text style={{
+                    color: isMaxed ? "#888" : canBuy ? "#00ff66" : "#ff4444",
+                    fontWeight: "900"
+                  }}>
+                    {isMaxed ? "SYSTÈME MAXIMAL" : `UPGRADE (${price})`}
                   </Text>
                 </Pressable>
               </View>
