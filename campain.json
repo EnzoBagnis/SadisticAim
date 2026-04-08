@@ -1,0 +1,292 @@
+{
+  "World_1": {
+    "world_name": "La Terre Pétrifiée",
+    "world_description": "L'élément solide a muté en une croissance géométrique incontrôlable. La roche se change en un cristal instable qui menace de tout figer.",
+    "Level_1_1": {
+      "name": "Le Sentier de Silice",
+      "description": "Système instable. Purge géologique requise. Calibrez votre capteur.",
+      "start_text": "Le système géologique primordial est corrompu. La terre organique s'est cristallisée en une structure de silice instable. Initiez la séquence de purge pour éviter la fragmentation.",
+      "end_text": "Secteur stabilisé. La silice se refroidit.",
+      "background": "",
+      "TARGET_W": 50, "TARGET_H": 80, "TARGET_SPEED": 1.5, "SWEET_W": 14, "SWEET_H": 14,
+      "BOOST_MAX": 100, "BOOST_MISS": -15, "BOOST_DRAIN": 0.15, "DIRECTION_CHANGE_MS": 1200
+    },
+    "Level_1_2": {
+      "name": "L'Éveil des Failles",
+      "description": "Les vibrations augmentent. Suivez la ligne de faille.",
+      "start_text": "Les plaques tectoniques vibrent à une fréquence anormale. Une faille d'énergie pure vient de s'ouvrir droit devant. Stabilisez les sismographes avant la rupture.",
+      "end_text": "Faille refermée. Énergie contenue.",
+      "background": "",
+      "TARGET_W": 45, "TARGET_H": 70, "TARGET_SPEED": 1.8, "SWEET_W": 12, "SWEET_H": 12,
+      "BOOST_MAX": 120, "BOOST_MISS": -18, "BOOST_DRAIN": 0.20, "DIRECTION_CHANGE_MS": 1100
+    },
+    "Level_1_3": {
+      "name": "Les Cavernes de Verre Mort",
+      "description": "Résonance de cristal détectée. Maintenez le cap.",
+      "start_text": "Vous entrez dans les profondeurs sédimentaires. La roche ici a été vitrifiée par une chaleur d'origine inconnue. L'écho de vos pas résonne comme un compte à rebours.",
+      "end_text": "Résonance annulée.",
+      "background": "",
+      "TARGET_W": 42, "TARGET_H": 65, "TARGET_SPEED": 2.1, "SWEET_W": 12, "SWEET_H": 12,
+      "BOOST_MAX": 150, "BOOST_MISS": -20, "BOOST_DRAIN": 0.25, "DIRECTION_CHANGE_MS": 1000
+    },
+    "Level_1_4": {
+      "name": "Le Pic des Monolithes",
+      "description": "Densité structurelle critique. Précision maximale exigée.",
+      "start_text": "L'ascension commence. Des piliers géométriques sortent du sol comme des lances. La gravité semble altérée par la densité du minéral surchargé.",
+      "end_text": "Structure purgée. Vous approchez du cœur.",
+      "background": "",
+      "TARGET_W": 40, "TARGET_H": 60, "TARGET_SPEED": 2.3, "SWEET_W": 10, "SWEET_H": 10,
+      "BOOST_MAX": 180, "BOOST_MISS": -22, "BOOST_DRAIN": 0.30, "DIRECTION_CHANGE_MS": 900
+    },
+    "Level_1_5": {
+      "name": "La Citadelle de Sédiment",
+      "description": "L'antichambre du gardien. L'air est lourd.",
+      "start_text": "Le sédiment forme une forteresse impénétrable. C'est l'antichambre du gardien, l'air est saturé de particules coupantes. La pression est à son comble.",
+      "end_text": "Accès au Noyau autorisé. Préparez-vous.",
+      "background": "",
+      "TARGET_W": 38, "TARGET_H": 55, "TARGET_SPEED": 2.5, "SWEET_W": 10, "SWEET_H": 10,
+      "BOOST_MAX": 220, "BOOST_MISS": -25, "BOOST_DRAIN": 0.35, "DIRECTION_CHANGE_MS": 800
+    },
+    "Level_1_6": {
+      "name": "GOLIATH, Le Cœur Tellurique",
+      "description": "Anomalie Majeure. Le minéral prend vie. Écrasez-le.",
+      "start_text": "Alerte système. La masse minérale s'est agrégée pour former une conscience rudimentaire et agressive. Goliath s'éveille pour défendre son noyau.",
+      "end_text": "Goliath effondré. Noyau Terre : HORS LIGNE.",
+      "background": "",
+      "TARGET_W": 40, "TARGET_H": 60, "TARGET_SPEED": 2.8, "SWEET_W": 12, "SWEET_H": 12,
+      "BOOST_MAX": 600, "BOOST_MISS": -30, "BOOST_DRAIN": 0.45, "DIRECTION_CHANGE_MS": 750
+    }
+  },
+  "World_2": {
+    "world_name": "Le Déluge de Néon",
+    "world_description": "L'eau ne coule plus, elle vibre comme un circuit imprimé liquide. Un océan de données corrompues et de bioluminescence toxique.",
+    "Level_2_1": {
+      "name": "La Rive de l'Oubli",
+      "description": "L'eau est saturée de données bioluminescentes. Connectez-vous.",
+      "start_text": "L'eau n'est plus qu'un vecteur de données surchargé, brillant d'un néon malade. Plongez dans ce flux numérique et commencez la décryptation.",
+      "end_text": "Données drainées. Le courant reprend.",
+      "background": "",
+      "TARGET_W": 35, "TARGET_H": 50, "TARGET_SPEED": 3.0, "SWEET_W": 10, "SWEET_H": 10,
+      "BOOST_MAX": 250, "BOOST_MISS": -25, "BOOST_DRAIN": 0.40, "DIRECTION_CHANGE_MS": 750
+    },
+    "Level_2_2": {
+      "name": "Le Courant Luminescent",
+      "description": "Les fluides s'accélèrent. Gardez le rythme.",
+      "start_text": "Le courant s'accélère, transformant la rivière en un circuit imprimé liquide. Les informations s'entrechoquent et créent des bugs visuels. Gardez le cap.",
+      "end_text": "Flux stabilisé.",
+      "background": "",
+      "TARGET_W": 33, "TARGET_H": 48, "TARGET_SPEED": 3.2, "SWEET_W": 9, "SWEET_H": 9,
+      "BOOST_MAX": 280, "BOOST_MISS": -28, "BOOST_DRAIN": 0.45, "DIRECTION_CHANGE_MS": 700
+    },
+    "Level_2_3": {
+      "name": "L'Abysse de Saphir",
+      "description": "La pression augmente. Vos erreurs coûteront cher.",
+      "start_text": "La lumière de la surface ne parvient plus jusqu'ici. La pression atmosphérique simule un écrasement de vos fichiers vitaux. Surveillez votre jauge.",
+      "end_text": "Pression relâchée.",
+      "background": "",
+      "TARGET_W": 30, "TARGET_H": 45, "TARGET_SPEED": 3.4, "SWEET_W": 9, "SWEET_H": 9,
+      "BOOST_MAX": 320, "BOOST_MISS": -30, "BOOST_DRAIN": 0.50, "DIRECTION_CHANGE_MS": 650
+    },
+    "Level_2_4": {
+      "name": "Les Chutes de Glace Vive",
+      "description": "Des pics de gel perturbent le signal. Visez juste.",
+      "start_text": "Chute de température critique. L'eau luminescente se fige en pics de glace coupants comme des rasoirs. Un faux mouvement et le système gèle.",
+      "end_text": "Gel fracturé. La voie est libre.",
+      "background": "",
+      "TARGET_W": 28, "TARGET_H": 42, "TARGET_SPEED": 3.6, "SWEET_W": 8, "SWEET_H": 8,
+      "BOOST_MAX": 360, "BOOST_MISS": -35, "BOOST_DRAIN": 0.60, "DIRECTION_CHANGE_MS": 600
+    },
+    "Level_2_5": {
+      "name": "L'Océan Statique",
+      "description": "L'eau grésille d'une énergie étrangère.",
+      "start_text": "L'océan est immobile, parcouru de grésillements électriques. Une paix artificielle qui cache une immense réserve d'énergie corrompue prête à exploser.",
+      "end_text": "L'océan se calme. Le Léviathan s'éveille.",
+      "background": "",
+      "TARGET_W": 25, "TARGET_H": 40, "TARGET_SPEED": 3.8, "SWEET_W": 8, "SWEET_H": 8,
+      "BOOST_MAX": 400, "BOOST_MISS": -40, "BOOST_DRAIN": 0.70, "DIRECTION_CHANGE_MS": 550
+    },
+    "Level_2_6": {
+      "name": "LÉVIATHAN, La Marée Éternelle",
+      "description": "Une vague de corruption pure. Survivez au tsunami.",
+      "start_text": "La marée se lève et prend la forme d'un serpent de données massif. Le Léviathan contrôle l'océan statique. Purgez l'entité de ses erreurs.",
+      "end_text": "Léviathan asséché. Noyau Eau : HORS LIGNE.",
+      "background": "",
+      "TARGET_W": 30, "TARGET_H": 45, "TARGET_SPEED": 4.2, "SWEET_W": 10, "SWEET_H": 10,
+      "BOOST_MAX": 1000, "BOOST_MISS": -45, "BOOST_DRAIN": 0.85, "DIRECTION_CHANGE_MS": 500
+    }
+  },
+  "World_3": {
+    "world_name": "La Fournaise de Cobalt",
+    "world_description": "Oubliez la lave rouge. Ici, tout brûle d'une flamme bleue électrique. Une usine de plasma à ciel ouvert qui consume l'oxygène.",
+    "Level_3_1": {
+      "name": "Les Braises Naissantes",
+      "description": "Surcharge thermique détectée. Des flammes de plasma bleu.",
+      "start_text": "Oubliez le rouge. Ici, la chaleur a atteint le stade du plasma bleu électrique. Le moindre contact avec l'air crée des explosions thermiques en chaîne.",
+      "end_text": "Feu maîtrisé. Température en baisse.",
+      "background": "",
+      "TARGET_W": 25, "TARGET_H": 40, "TARGET_SPEED": 4.5, "SWEET_W": 8, "SWEET_H": 8,
+      "BOOST_MAX": 450, "BOOST_MISS": -40, "BOOST_DRAIN": 0.80, "DIRECTION_CHANGE_MS": 550
+    },
+    "Level_3_2": {
+      "name": "La Forge de l'Enfer Bleu",
+      "description": "La chaleur rend les mouvements erratiques. Restez concentré.",
+      "start_text": "Vous pénétrez dans l'usine de fusion de ce monde. Les machines invisibles crachent des flammes de cobalt, et la température fait fondre vos capteurs.",
+      "end_text": "Forge éteinte.",
+      "background": "",
+      "TARGET_W": 23, "TARGET_H": 38, "TARGET_SPEED": 4.8, "SWEET_W": 7, "SWEET_H": 7,
+      "BOOST_MAX": 480, "BOOST_MISS": -45, "BOOST_DRAIN": 0.90, "DIRECTION_CHANGE_MS": 500
+    },
+    "Level_3_3": {
+      "name": "Le Souffle Magmatique",
+      "description": "Drain d'énergie intense. Frappez vite et fort.",
+      "start_text": "Un fleuve de matière en fusion, presque blanc tant il est chaud, traverse la zone. L'énergie siphonnée ici est gigantesque. Frappez vite pour couper l'alimentation.",
+      "end_text": "Magma refroidi.",
+      "background": "",
+      "TARGET_W": 22, "TARGET_H": 35, "TARGET_SPEED": 5.1, "SWEET_W": 7, "SWEET_H": 7,
+      "BOOST_MAX": 520, "BOOST_MISS": -50, "BOOST_DRAIN": 1.0, "DIRECTION_CHANGE_MS": 450
+    },
+    "Level_3_4": {
+      "name": "Le Brasier des Âmes",
+      "description": "La cible danse dans les flammes. Ne la perdez pas.",
+      "start_text": "Les flammes prennent des formes fantomatiques, dansant au rythme chaotique des surtensions. Ce brasier cherche activement à consumer votre essence numérique.",
+      "end_text": "Brasier soufflé.",
+      "background": "",
+      "TARGET_W": 20, "TARGET_H": 32, "TARGET_SPEED": 5.4, "SWEET_W": 6, "SWEET_H": 6,
+      "BOOST_MAX": 560, "BOOST_MISS": -55, "BOOST_DRAIN": 1.15, "DIRECTION_CHANGE_MS": 400
+    },
+    "Level_3_5": {
+      "name": "La Couronne de Cendre",
+      "description": "Le cœur du volcan de cobalt. La chaleur est insoutenable.",
+      "start_text": "Le sommet du volcan crache une cendre chargée statiquement qui obscurcit l'interface. La chaleur est insoutenable, votre système de refroidissement est en alerte rouge.",
+      "end_text": "Cendres dispersées. Incandescence critique.",
+      "background": "",
+      "TARGET_W": 18, "TARGET_H": 30, "TARGET_SPEED": 5.7, "SWEET_W": 6, "SWEET_H": 6,
+      "BOOST_MAX": 600, "BOOST_MISS": -60, "BOOST_DRAIN": 1.30, "DIRECTION_CHANGE_MS": 380
+    },
+    "Level_3_6": {
+      "name": "IGNIS, La Singularité Solaire",
+      "description": "Il consume tout. Clicquez comme si votre vie en dépendait.",
+      "start_text": "La singularité est instable. Ignis n'est plus un simple élément, c'est une étoile naine bleue confinée au cœur de la machine. Éteignez-la avant l'explosion.",
+      "end_text": "Ignis éteint. Noyau Feu : HORS LIGNE.",
+      "background": "",
+      "TARGET_W": 22, "TARGET_H": 35, "TARGET_SPEED": 6.0, "SWEET_W": 8, "SWEET_H": 8,
+      "BOOST_MAX": 1500, "BOOST_MISS": -70, "BOOST_DRAIN": 1.50, "DIRECTION_CHANGE_MS": 350
+    }
+  },
+  "World_4": {
+    "world_name": "L'Ouragan Électrique",
+    "world_description": "L'atmosphère est devenue une immense bobine Tesla. L'air est saturé d'électricité statique et chaque tempête déchire la matière.",
+    "Level_4_1": {
+      "name": "La Brise du Chaos",
+      "description": "Le vent est électrifié. Les mouvements deviennent imprévisibles.",
+      "start_text": "L'atmosphère s'est transformée en une bobine Tesla géante. L'air crépite et chaque bourrasque transporte une charge létale. Calibrez vos isolants au plus vite.",
+      "end_text": "Vent dissipé.",
+      "background": "",
+      "TARGET_W": 18, "TARGET_H": 30, "TARGET_SPEED": 6.2, "SWEET_W": 6, "SWEET_H": 6,
+      "BOOST_MAX": 650, "BOOST_MISS": -60, "BOOST_DRAIN": 1.40, "DIRECTION_CHANGE_MS": 350
+    },
+    "Level_4_2": {
+      "name": "L'Oeil de la Tempête",
+      "description": "Le calme apparent cache une vitesse fulgurante.",
+      "start_text": "Le cyclone est d'une envergure colossale, mais son centre est d'un calme trompeur. La vitesse de rotation de la matière autour de vous dépasse l'entendement.",
+      "end_text": "Stabilité atmosphérique restaurée.",
+      "background": "",
+      "TARGET_W": 16, "TARGET_H": 28, "TARGET_SPEED": 6.5, "SWEET_W": 5, "SWEET_H": 5,
+      "BOOST_MAX": 700, "BOOST_MISS": -65, "BOOST_DRAIN": 1.55, "DIRECTION_CHANGE_MS": 320
+    },
+    "Level_4_3": {
+      "name": "Le Sanctuaire de Volt",
+      "description": "Des arcs électriques parasitent l'air. Réagissez.",
+      "start_text": "Des arcs électriques massifs bondissent de manière aléatoire entre des piliers flottants. C'est le cœur battant de la tempête, un sanctuaire dédié à la haute tension.",
+      "end_text": "Arcs contenus.",
+      "background": "",
+      "TARGET_W": 15, "TARGET_H": 25, "TARGET_SPEED": 6.8, "SWEET_W": 5, "SWEET_H": 5,
+      "BOOST_MAX": 750, "BOOST_MISS": -70, "BOOST_DRAIN": 1.70, "DIRECTION_CHANGE_MS": 290
+    },
+    "Level_4_4": {
+      "name": "Les Éclairs de Jade",
+      "description": "Chaque erreur vide vos réserves. Interception immédiate.",
+      "start_text": "La foudre a pris une teinte jade hautement toxique pour le système. Chaque éclair frappe avec une précision algorithmique effrayante. Esquivez la surcharge.",
+      "end_text": "Éclairs mis à la terre.",
+      "background": "",
+      "TARGET_W": 14, "TARGET_H": 22, "TARGET_SPEED": 7.1, "SWEET_W": 4, "SWEET_H": 4,
+      "BOOST_MAX": 800, "BOOST_MISS": -80, "BOOST_DRAIN": 1.90, "DIRECTION_CHANGE_MS": 260
+    },
+    "Level_4_5": {
+      "name": "Le Sommet des Bourrasques",
+      "description": "L'ouragan est à son paroxysme. Tenez bon.",
+      "start_text": "L'air est si chargé que vous pouvez virtuellement marcher sur l'électricité statique. L'ouragan hurle à son paroxysme absolu, signifiant que le gardien est tout proche.",
+      "end_text": "Bourrasques domptées. Accès à Zéphyr.",
+      "background": "",
+      "TARGET_W": 13, "TARGET_H": 20, "TARGET_SPEED": 7.5, "SWEET_W": 4, "SWEET_H": 4,
+      "BOOST_MAX": 850, "BOOST_MISS": -90, "BOOST_DRAIN": 2.10, "DIRECTION_CHANGE_MS": 230
+    },
+    "Level_4_6": {
+      "name": "ZÉPHYR, La Foudre Incarnée",
+      "description": "Vitesse extrême. Ne clignez pas des yeux.",
+      "start_text": "Un vortex d'éclairs condensés se dresse devant vous. Zéphyr n'a plus de forme physique, il est la foudre incarnée, imprévisible et destructeur. Isolez son noyau.",
+      "end_text": "Zéphyr dissipé. Noyau Air : HORS LIGNE.",
+      "background": "",
+      "TARGET_W": 15, "TARGET_H": 25, "TARGET_SPEED": 8.5, "SWEET_W": 6, "SWEET_H": 6,
+      "BOOST_MAX": 2000, "BOOST_MISS": -100, "BOOST_DRAIN": 2.50, "DIRECTION_CHANGE_MS": 200
+    }
+  },
+  "World_5": {
+    "world_name": "Le Vide Absolu",
+    "world_description": "Là où les éléments se rejoignent et s'annulent. Le dernier rempart avant le crash système total de la réalité.",
+    "Level_5_1": {
+      "name": "Le Seuil de l'Infini",
+      "description": "La réalité se fragmente. Les lois physiques ne s'appliquent plus.",
+      "start_text": "Bienvenue dans la zone morte. Les éléments s'annulent mutuellement, créant de vastes failles dans le code de la réalité. Le vide aspire toutes vos ressources.",
+      "end_text": "Seuil franchi.",
+      "background": "",
+      "TARGET_W": 12, "TARGET_H": 18, "TARGET_SPEED": 8.0, "SWEET_W": 4, "SWEET_H": 4,
+      "BOOST_MAX": 900, "BOOST_MISS": -80, "BOOST_DRAIN": 2.20, "DIRECTION_CHANGE_MS": 250
+    },
+    "Level_5_2": {
+      "name": "L'Écho du Néant",
+      "description": "L'antimatière draine votre barre. Vitesse d'exécution vitale.",
+      "start_text": "Il n'y a plus de matière ici, juste l'écho des mondes précédents qui tourne en boucle dans le néant. L'antimatière ronge votre barre de stabilisation en continu.",
+      "end_text": "Écho réduit au silence.",
+      "background": "",
+      "TARGET_W": 11, "TARGET_H": 16, "TARGET_SPEED": 8.5, "SWEET_W": 3, "SWEET_H": 3,
+      "BOOST_MAX": 1000, "BOOST_MISS": -90, "BOOST_DRAIN": 2.40, "DIRECTION_CHANGE_MS": 220
+    },
+    "Level_5_3": {
+      "name": "Les Reliques de l'Éther",
+      "description": "Vestiges de l'ancien monde. Contournez le bruit visuel.",
+      "start_text": "Des fragments de l'ancien univers flottent sans aucun but. Ces reliques corrompues génèrent un bruit visuel intense. Concentrez-vous uniquement sur la cible principale.",
+      "end_text": "Reliques désintégrées.",
+      "background": "",
+      "TARGET_W": 10, "TARGET_H": 15, "TARGET_SPEED": 9.0, "SWEET_W": 3, "SWEET_H": 3,
+      "BOOST_MAX": 1100, "BOOST_MISS": -100, "BOOST_DRAIN": 2.60, "DIRECTION_CHANGE_MS": 190
+    },
+    "Level_5_4": {
+      "name": "La Réalité Distordue",
+      "description": "Changement de direction permanent. Fiez-vous à l'instinct.",
+      "start_text": "Haut, bas, gauche, droite... Les axes de navigation n'ont plus aucun sens. La gravité et le temps se distordent à chaque seconde qui passe. Suivez votre instinct.",
+      "end_text": "Réalité alignée.",
+      "background": "",
+      "TARGET_W": 9, "TARGET_H": 14, "TARGET_SPEED": 9.5, "SWEET_W": 3, "SWEET_H": 3,
+      "BOOST_MAX": 1200, "BOOST_MISS": -110, "BOOST_DRAIN": 2.80, "DIRECTION_CHANGE_MS": 160
+    },
+    "Level_5_5": {
+      "name": "Le Cœur du Nexus",
+      "description": "Le système est sur le point de s'effondrer. Dernière ligne droite.",
+      "start_text": "Le processeur central de l'univers est en vue. Tout converge ici, dans un maelström de données pures et létales. C'est la dernière ligne droite avant le cœur du problème.",
+      "end_text": "Cœur atteint. Singularité imminente.",
+      "background": "",
+      "TARGET_W": 8, "TARGET_H": 12, "TARGET_SPEED": 10.0, "SWEET_W": 2, "SWEET_H": 2,
+      "BOOST_MAX": 1300, "BOOST_MISS": -120, "BOOST_DRAIN": 3.00, "DIRECTION_CHANGE_MS": 130
+    },
+    "Level_5_6": {
+      "name": "L'ENTITÉ ZÉRO",
+      "description": "L'erreur système originelle. Surchargez le noyau pour tout redémarrer.",
+      "start_text": "L'Entité Zéro. Le premier bug, l'erreur fatale monumentale qui a déclenché tout cet overclocking. Surchargez ce noyau de vos propres mains pour forcer le reboot de la réalité.",
+      "end_text": "CRASH SYSTÈME. REBOOT EN COURS... FÉLICITATIONS.",
+      "background": "",
+      "TARGET_W": 12, "TARGET_H": 18, "TARGET_SPEED": 12.0, "SWEET_W": 4, "SWEET_H": 4,
+      "BOOST_MAX": 3000, "BOOST_MISS": -150, "BOOST_DRAIN": 4.00, "DIRECTION_CHANGE_MS": 100
+    }
+  }
+}
