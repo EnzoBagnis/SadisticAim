@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { Audio } from 'expo-av';
 
 const musicSource = require('../../assets/sounds/music.mp3');
 const clickSource = require('../../assets/sounds/click.mp3');
@@ -9,55 +9,83 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
   const soundVolumeRef = useRef(initialSoundVolume);
   const musicStartedRef = useRef(false);
 
-  const musicPlayer = useAudioPlayer(musicSource);
-  const clickPlayer = useAudioPlayer(clickSource);
-  const missPlayer = useAudioPlayer(missSource);
+  const musicPlayerRef = useRef(null);
+  const clickPlayerRef = useRef(null);
+  const missPlayerRef = useRef(null);
 
   useEffect(() => {
-    setAudioModeAsync({ playsInSilentModeIOS: true });
+    Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+
+    async function loadSounds() {
+      const { sound: musicSound } = await Audio.Sound.createAsync(musicSource, { isLooping: true, volume: initialMusicVolume });
+      const { sound: clickSound } = await Audio.Sound.createAsync(clickSource, { volume: initialSoundVolume });
+      const { sound: missSound } = await Audio.Sound.createAsync(missSource, { volume: initialSoundVolume });
+
+      musicPlayerRef.current = musicSound;
+      clickPlayerRef.current = clickSound;
+      missPlayerRef.current = missSound;
+
+      if (!settingsLoaded || musicStartedRef.current) return;
+
+      if (initialMusicVolume > 0) {
+        await musicSound.playAsync();
+      }
+      musicStartedRef.current = true;
+    }
+
+    loadSounds();
+
+    return () => {
+      if (musicPlayerRef.current) musicPlayerRef.current.unloadAsync();
+      if (clickPlayerRef.current) clickPlayerRef.current.unloadAsync();
+      if (missPlayerRef.current) missPlayerRef.current.unloadAsync();
+    };
   }, []);
 
   useEffect(() => {
-    if (!settingsLoaded || musicStartedRef.current) return;
     soundVolumeRef.current = initialSoundVolume;
-
-    musicPlayer.loop = true;
-    musicPlayer.volume = initialMusicVolume;
-    clickPlayer.volume = initialSoundVolume;
-    missPlayer.volume = initialSoundVolume;
-
-    if (initialMusicVolume > 0) {
-      musicPlayer.play();
+    if (musicPlayerRef.current) {
+      musicPlayerRef.current.setVolumeAsync(initialMusicVolume);
     }
-    musicStartedRef.current = true;
-  }, [settingsLoaded, initialMusicVolume, initialSoundVolume, musicPlayer, clickPlayer, missPlayer]);
+    if (clickPlayerRef.current) {
+      clickPlayerRef.current.setVolumeAsync(initialSoundVolume);
+    }
+    if (missPlayerRef.current) {
+      missPlayerRef.current.setVolumeAsync(initialSoundVolume);
+    }
+  }, [initialMusicVolume, initialSoundVolume]);
 
-  const playClick = useCallback(() => {
-    if (soundVolumeRef.current <= 0) return;
-    clickPlayer.seekTo(0);
-    clickPlayer.play();
-  }, [clickPlayer]);
 
-  const playMiss = useCallback(() => {
-    if (soundVolumeRef.current <= 0) return;
-    missPlayer.seekTo(0);
-    missPlayer.play();
-  }, [missPlayer]);
+  const playClick = useCallback(async () => {
+    if (soundVolumeRef.current <= 0 || !clickPlayerRef.current) return;
+    await clickPlayerRef.current.setPositionAsync(0);
+    await clickPlayerRef.current.playAsync();
+  }, []);
 
-  const setMusicVolume = useCallback((volume) => {
-    musicPlayer.volume = volume;
-    if (volume > 0 && !musicPlayer.playing) {
-      musicPlayer.play();
+  const playMiss = useCallback(async () => {
+    if (soundVolumeRef.current <= 0 || !missPlayerRef.current) return;
+    await missPlayerRef.current.setPositionAsync(0);
+    await missPlayerRef.current.playAsync();
+  }, []);
+
+  const setMusicVolume = useCallback(async (volume) => {
+    if (!musicPlayerRef.current) return;
+    await musicPlayerRef.current.setVolumeAsync(volume);
+    if (volume > 0) {
+      const status = await musicPlayerRef.current.getStatusAsync();
+      if (!status.isPlaying) {
+        await musicPlayerRef.current.playAsync();
+      }
     } else if (volume <= 0) {
-      musicPlayer.pause();
+      await musicPlayerRef.current.pauseAsync();
     }
-  }, [musicPlayer]);
+  }, []);
 
-  const setSoundVolume = useCallback((volume) => {
+  const setSoundVolume = useCallback(async (volume) => {
     soundVolumeRef.current = volume;
-    clickPlayer.volume = volume;
-    missPlayer.volume = volume;
-  }, [clickPlayer, missPlayer]);
+    if (clickPlayerRef.current) await clickPlayerRef.current.setVolumeAsync(volume);
+    if (missPlayerRef.current) await missPlayerRef.current.setVolumeAsync(volume);
+  }, []);
 
   return { playClick, playMiss, setMusicVolume, setSoundVolume };
 }
