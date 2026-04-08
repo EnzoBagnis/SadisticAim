@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Pressable,
-  Alert,
-} from "react-native";
-import { useGyroscope } from "./src/hooks/useGyroscope";
-import ClickBar from "./src/components/ClickBar";
-import BoostBar from "./src/components/BoostBar";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, TouchableWithoutFeedback, TouchableOpacity, Pressable, Alert, Button, StyleSheet } from 'react-native';
+import { GameProvider, useGame } from './src/context/GameContext';
+import ClickBar from './src/components/ClickBar';
+import BoostBar from './src/components/BoostBar';
+import SettingsModal from './src/components/SettingsModal';
+import CampaignScreen from './src/screens/CampaignScreen';
 import Shop from "./src/components/Shop";
-import SettingsModal from "./src/components/SettingsModal";
 import { GameProvider, useGame } from "./src/context/GameContext";
 import {
   ZONE_W,
@@ -232,6 +227,13 @@ function GameScreen() {
         </View>
 
       <BoostBar value={boost} max={BOOST_MAX} />
+        <View style={{ marginTop: 20 }}>
+          <Button
+            onPress={onGoToCampaign}
+            title="Aller à la campagne"
+            color="#28a745"
+          />
+        </View>
 
       <Pressable
         onPress={() => setShowShop((value) => !value)}
@@ -259,14 +261,20 @@ function GameScreen() {
 }
 
 export default function App() {
+  const [currentScreen, setCurrentScreen] = useState('main');
+
   return (
     <GameProvider>
-      <GameScreen />
+      {currentScreen === 'campaign' ? (
+        <CampaignScreen onGoBack={() => setCurrentScreen('main')} />
+      ) : (
+        <GameScreen onGoToCampaign={() => setCurrentScreen('campaign')} />
+      )}
     </GameProvider>
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   settingsBtn: {
     position: 'absolute',
     top: 50,
@@ -283,4 +291,4 @@ const styles = {
     fontSize: 24,
     color: '#fff',
   },
-};
+});

@@ -19,8 +19,8 @@ const GAME_CONFIG = {
   SWEET_H: 14,
   TARGET_SPEED: 1.5,
   BOOST_MAX: 100,
-  BOOST_HIT: 10,
-  BOOST_SWEET: 25,
+  BOOST_HIT: 100,
+  BOOST_SWEET: 250,
   BOOST_MISS: -15,
   BOOST_DRAIN: 0.15,
   DIRECTION_CHANGE_MS: 1200,
@@ -33,11 +33,12 @@ export function GameProvider({ children }) {
   const gyro = useGyroscope();
   const audio = useAudio(loaded, settings.musicVolume, settings.soundVolume);
 
+  const [currentConfig, setCurrentConfig] = useState(GAME_CONFIG);
   const [boost, setBoost] = useState(0);
   const [won, setWon] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
-  const [targetX, setTargetX] = useState(ZONE_W / 2 - GAME_CONFIG.TARGET_W / 2);
-  const targetXRef = useRef(ZONE_W / 2 - GAME_CONFIG.TARGET_W / 2);
+  const [targetX, setTargetX] = useState(ZONE_W / 2 - currentConfig.TARGET_W / 2);
+  const targetXRef = useRef(ZONE_W / 2 - currentConfig.TARGET_W / 2);
   const dirRef = useRef(1);
 
   const cursorX = Math.max(0, Math.min(ZONE_W / 2 + gyro.x, ZONE_W));
@@ -46,10 +47,10 @@ export function GameProvider({ children }) {
   useEffect(() => {
     if (won) return;
     const id = setInterval(() => {
-      setBoost((b) => Math.max(0, b - GAME_CONFIG.BOOST_DRAIN));
+      setBoost((b) => Math.max(0, b - currentConfig.BOOST_DRAIN));
     }, 100);
     return () => clearInterval(id);
-  }, [won]);
+  }, [won, currentConfig.BOOST_DRAIN]);
 
   useEffect(() => {
     if (won) return;
@@ -58,14 +59,14 @@ export function GameProvider({ children }) {
 
     const animate = () => {
       const now = Date.now();
-      if (now - lastDirChange > GAME_CONFIG.DIRECTION_CHANGE_MS) {
+      if (now - lastDirChange > currentConfig.DIRECTION_CHANGE_MS) {
         dirRef.current = Math.random() > 0.5 ? 1 : -1;
         lastDirChange = now;
       }
 
-      let nx = targetXRef.current + dirRef.current * GAME_CONFIG.TARGET_SPEED;
-      if (nx < 0 || nx > ZONE_W - GAME_CONFIG.TARGET_W) dirRef.current *= -1;
-      nx = Math.max(0, Math.min(nx, ZONE_W - GAME_CONFIG.TARGET_W));
+      let nx = targetXRef.current + dirRef.current * currentConfig.TARGET_SPEED;
+      if (nx < 0 || nx > ZONE_W - currentConfig.TARGET_W) dirRef.current *= -1;
+      nx = Math.max(0, Math.min(nx, ZONE_W - currentConfig.TARGET_W));
 
       targetXRef.current = nx;
       setTargetX(nx);
@@ -74,38 +75,45 @@ export function GameProvider({ children }) {
 
     frameId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frameId);
-  }, [won]);
+  }, [won, currentConfig.DIRECTION_CHANGE_MS, currentConfig.TARGET_SPEED, currentConfig.TARGET_W]);
 
   const handleTap = useCallback(() => {
     if (won || settingsVisible) return;
 
-    const { TARGET_W, SWEET_W, SWEET_H, BOOST_MISS, BOOST_SWEET, BOOST_HIT, BOOST_MAX } = GAME_CONFIG;
+    const { TARGET_W, TARGET_H, SWEET_W, SWEET_H, BOOST_MISS, BOOST_SWEET, BOOST_HIT, BOOST_MAX, ZONE_H } = currentConfig;
 
     const onTargetX = cursorX >= targetX && cursorX <= targetX + TARGET_W;
-    const onTargetY = cursorY >= 0 && cursorY <= ZONE_H;
+    const targetMinY = (ZONE_H - TARGET_H) / 2;
+    const targetMaxY = targetMinY + TARGET_H;
+    const onTargetY = cursorY >= targetMinY && cursorY <= targetMaxY;
 
     if (!onTargetX || !onTargetY) {
-      audio.playMiss();
+      if (audio.playMiss) audio.playMiss();
       setBoost((b) => Math.max(0, b + BOOST_MISS));
       return;
     }
 
-    audio.playClick();
+    if (audio.playClick) audio.playClick();
+    const sweetMinY = (TARGET_H - SWEET_H) / 2 + targetMinY;
     const sweetX = targetX + (TARGET_W - SWEET_W) / 2;
-    const sweetY = (ZONE_H - GAME_CONFIG.SWEET_H) / 2;
+
     const onSweet = cursorX >= sweetX && cursorX <= sweetX + SWEET_W
-      && cursorY >= sweetY && cursorY <= sweetY + SWEET_H;
+      && cursorY >= sweetMinY && cursorY <= sweetMinY + SWEET_H;
 
     const gain = onSweet ? BOOST_SWEET : BOOST_HIT;
     const newBoost = Math.min(BOOST_MAX, boost + gain);
     setBoost(newBoost);
 
     return newBoost >= BOOST_MAX;
-  }, [cursorX, cursorY, targetX, boost, won, settingsVisible, audio]);
+  }, [cursorX, cursorY, targetX, boost, won, settingsVisible, audio, currentConfig]);
 
   const resetGame = useCallback(() => {
     setBoost(0);
     setWon(false);
+  }, []);
+
+  const updateConfig = useCallback((newValues) => {
+    setCurrentConfig(prev => ({ ...prev, ...newValues }));
   }, []);
 
   const setGameWon = useCallback(() => {
@@ -130,7 +138,7 @@ export function GameProvider({ children }) {
   const closeSettings = useCallback(() => setSettingsVisible(false), []);
 
   const value = {
-    config: GAME_CONFIG,
+    config: currentConfig,
     boost,
     won,
     targetX,
@@ -146,6 +154,7 @@ export function GameProvider({ children }) {
     recalibrate,
     openSettings,
     closeSettings,
+    updateConfig,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
