@@ -10,6 +10,8 @@ import { useGyroscope } from "./src/hooks/useGyroscope";
 import ClickBar from "./src/components/ClickBar";
 import BoostBar from "./src/components/BoostBar";
 import Shop from "./src/components/Shop";
+import SettingsModal from "./src/components/SettingsModal";
+import { GameProvider, useGame } from "./src/context/GameContext";
 import {
   ZONE_W,
   ZONE_H,
@@ -35,7 +37,7 @@ import {
   getTargetMovementZone,
 } from "./src/BaseVar";
 
-export default function App() {
+function GameScreen() {
   const gyro = useGyroscope();
   const [boost, setBoost] = useState(0);
   const [won, setWon] = useState(false);
@@ -159,8 +161,10 @@ export default function App() {
    const passivePointsPerSec = shopLevels.passivePoints && shopLevels.passivePoints > 0
      ? getPassivePoints(shopLevels.passivePoints)
      : 0;
+   const { openSettings } = useGame();
 
    return (
+    <TouchableWithoutFeedback onPress={handleTap}>
      <View
        style={{
          flex: 1,
@@ -184,7 +188,10 @@ export default function App() {
          )}
        </View>
 
-       <TouchableWithoutFeedback onPress={handleTap}>
+       <Pressable style={styles.settingsBtn} onPress={openSettings}>
+         <Text style={styles.settingsIcon}>⚙</Text>
+       </Pressable>
+
          <View
            style={{
              width: adjustedZoneWidth,
@@ -223,7 +230,6 @@ export default function App() {
             zoneH={adjustedZoneHeight}
           />
         </View>
-      </TouchableWithoutFeedback>
 
       <BoostBar value={boost} max={BOOST_MAX} />
 
@@ -245,7 +251,10 @@ export default function App() {
       {showShop ? (
         <Shop points={points} levels={shopLevels} onBuy={handleBuyUpgrade} />
       ) : null}
-    </View>
+
+      <SettingsModal />
+     </View>
+    </TouchableWithoutFeedback>
   );
 }
 
