@@ -98,7 +98,7 @@ function GameScreen({ onGoToCampaign }) {
    }, [won, shopLevels]);
 
    const handleTap = useCallback(() => {
-     if (won) return;
+     if (won || settingsVisible) return;
 
      const adjustedZoneHeight = getZoneHeight(ZONE_H, shopLevels.biggerZone ?? 0);
      // Appliquer améliorations pour la taille de la zone douce
@@ -109,10 +109,13 @@ function GameScreen({ onGoToCampaign }) {
      const onTargetY = cursorY >= 0 && cursorY <= adjustedZoneHeight;
 
      if (!onTargetX || !onTargetY) {
+       if (playMiss) playMiss();
        const missLoss = getBoostMissLoss(BOOST_MISS, shopLevels.lessLoss ?? 0);
        setBoost((b) => Math.max(0, b + missLoss));
        return;
      }
+
+     if (playClick) playClick();
      const sweetX = targetX + (TARGET_W - adjustedSweetW) / 2;
      const sweetY = (adjustedZoneHeight - adjustedSweetH) / 2;
      const onSweet =
@@ -135,7 +138,7 @@ function GameScreen({ onGoToCampaign }) {
        setWon(false);
      }
      setPoints((currentPoints) => currentPoints + gain);
-   }, [cursorX, cursorY, targetX, boost, won, shopLevels]);
+   }, [cursorX, cursorY, targetX, boost, won, shopLevels, playClick, playMiss, settingsVisible]);
 
   const handleBuyUpgrade = useCallback((upgradeId, price) => {
     setPoints((currentPoints) => {
@@ -155,10 +158,10 @@ function GameScreen({ onGoToCampaign }) {
    const passivePointsPerSec = shopLevels.passivePoints && shopLevels.passivePoints > 0
      ? getPassivePoints(shopLevels.passivePoints)
      : 0;
-   const { openSettings } = useGame();
+   const { openSettings, playClick, playMiss, settingsVisible } = useGame();
 
    return (
-    <TouchableWithoutFeedback onPress={handleTap} disabled={showShop}>
+    <TouchableWithoutFeedback onPress={() => { if (!settingsVisible) handleTap(); }} disabled={showShop}>
      <View
        style={{
          flex: 1,

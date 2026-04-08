@@ -159,6 +159,8 @@ export function GameProvider({ children }) {
     closeSettings,
     updateConfig,
     playGlobalMusic: audio.playGlobalMusic, // Expose to screens
+    playClick: audio.playClick,
+    playMiss: audio.playMiss,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
