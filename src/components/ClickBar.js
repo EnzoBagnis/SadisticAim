@@ -1,9 +1,7 @@
-import React from 'react';
-import { View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
+import { LINE, OVERFLOW } from "../BaseVar";
 import { useGame } from '../context/GameContext';
-
-const LINE = 2;
-const OVERFLOW = 15;
 
 export default function ClickBar() {
   const { cursorX, cursorY, config } = useGame();

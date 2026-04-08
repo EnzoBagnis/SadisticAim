@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Gyroscope } from 'expo-sensors';
-
-const SENSITIVITY = 150;
+import { useState, useEffect, useRef } from "react";
+import { Gyroscope } from "expo-sensors";
+import { SENSITIVITY } from "../BaseVar";
 
 export function useGyroscope() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
