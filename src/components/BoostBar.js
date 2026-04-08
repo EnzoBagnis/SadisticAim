@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { getBoostPercentage } from "../BaseVar";
+import { useGame } from '../context/GameContext';
 
 export default function BoostBar({ value, max }) {
+  const { boost, config } = useGame();
   const percentage = getBoostPercentage(value, max);
 
   return (

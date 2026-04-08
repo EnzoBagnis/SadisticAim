@@ -248,3 +248,30 @@ export default function App() {
     </View>
   );
 }
+
+export default function App() {
+  return (
+    <GameProvider>
+      <GameScreen />
+    </GameProvider>
+  );
+}
+
+const styles = {
+  settingsBtn: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsIcon: {
+    fontSize: 24,
+    color: '#fff',
+  },
+};
