@@ -6,7 +6,7 @@ import BoostBar from './src/components/BoostBar';
 import SettingsModal from './src/components/SettingsModal';
 import CampaignScreen from './src/screens/CampaignScreen';
 import Shop from "./src/components/Shop";
-import { GameProvider, useGame } from "./src/context/GameContext";
+import { useGyroscope } from './src/hooks/useGyroscope';
 import {
   ZONE_W,
   ZONE_H,
@@ -32,7 +32,7 @@ import {
   getTargetMovementZone,
 } from "./src/BaseVar";
 
-function GameScreen() {
+function GameScreen({ onGoToCampaign }) {
   const gyro = useGyroscope();
   const [boost, setBoost] = useState(0);
   const [won, setWon] = useState(false);
