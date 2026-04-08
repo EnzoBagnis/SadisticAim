@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableWithoutFeedback, TouchableOpacity, Pressable, Alert, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Pressable, Button, StyleSheet } from 'react-native';
 import { GameProvider, useGame } from './src/context/GameContext';
 import ClickBar from './src/components/ClickBar';
 import BoostBar from './src/components/BoostBar';
@@ -100,7 +100,6 @@ function GameScreen({ onGoToCampaign }) {
    const handleTap = useCallback(() => {
      if (won) return;
 
-     const adjustedZoneWidth = getZoneWidth(ZONE_W, shopLevels.biggerZone ?? 0);
      const adjustedZoneHeight = getZoneHeight(ZONE_H, shopLevels.biggerZone ?? 0);
      // Appliquer améliorations pour la taille de la zone douce
      const adjustedSweetW = getSweetZoneSize(SWEET_W, shopLevels.sweetZoneSize ?? 0);
@@ -159,7 +158,7 @@ function GameScreen({ onGoToCampaign }) {
    const { openSettings } = useGame();
 
    return (
-    <TouchableWithoutFeedback onPress={handleTap}>
+    <TouchableWithoutFeedback onPress={handleTap} disabled={showShop}>
      <View
        style={{
          flex: 1,
@@ -253,8 +252,7 @@ function GameScreen({ onGoToCampaign }) {
       {showShop ? (
         <Shop points={points} levels={shopLevels} onBuy={handleBuyUpgrade} />
       ) : null}
-
-      <SettingsModal />
+         <SettingsModal />
      </View>
     </TouchableWithoutFeedback>
   );
@@ -275,20 +273,22 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  settingsBtn: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  settingsIcon: {
-    fontSize: 24,
-    color: '#fff',
-  },
+
+
+    settingsBtn: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        zIndex: 10,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    settingsIcon: {
+        fontSize: 24,
+        color: '#fff',
+    },
 });

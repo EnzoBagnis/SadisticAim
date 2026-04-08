@@ -19,11 +19,14 @@ export default function Shop({ points = 0, levels = {}, onBuy }) {
         Points disponibles : {points}
       </Text>
 
-      <ScrollView
-        style={{ backgroundColor: "#0f1723", borderRadius: 10 }}
-        contentContainerStyle={{ padding: 12, gap: 10 }}
-        showsVerticalScrollIndicator={false}
-      >
+        <ScrollView
+            nestedScrollEnabled
+            keyboardShouldPersistTaps="handled"
+            style={{ backgroundColor: "#0f1723", borderRadius: 10 }}
+            contentContainerStyle={{ padding: 12, gap: 10 }}
+            showsVerticalScrollIndicator={false}
+        >
+
         {SHOP_ITEMS.map((item) => {
           const level = levels[item.id] ?? 0;
           const isMaxed = level >= item.maxLevel;
