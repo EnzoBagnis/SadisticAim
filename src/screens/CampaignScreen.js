@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableWithoutFeedback, Button, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Button, Modal, StyleSheet, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import ClickBar from '../components/ClickBar';
 import BoostBar from '../components/BoostBar';
+import SettingsModal from '../components/SettingsModal';
 import { useGame } from '../context/GameContext';
 import campaign from '../../campain.json';
 
@@ -16,7 +17,9 @@ export default function CampaignScreen({ onGoBack }) {
     resetGame,
     updateConfig,
     boost,
-    setGameWon
+    setGameWon,
+    playGlobalMusic,
+    openSettings
   } = useGame();
 
   const [level, setLevel] = useState(1);
@@ -36,6 +39,13 @@ export default function CampaignScreen({ onGoBack }) {
   useEffect(() => {
     // Initialize config for level 1
     updateCampaign(level,world);
+
+    // Fallback to main music when leaving CampaignScreen
+    return () => {
+      if (playGlobalMusic) {
+        playGlobalMusic('main');
+      }
+    };
   }, []);
 
   const updateCampaign = (currentLevel,world) => {
@@ -53,6 +63,15 @@ export default function CampaignScreen({ onGoBack }) {
       // On extrait la configuration de la campagne (sans le nom) pour l'appliquer au jeu
       const { name, description, start_text, end_text, background, ...configUpdates } = levelData;
       updateConfig(configUpdates);
+
+      // Play boss music if it's the 6th level (last level of the world), else play campaign music
+      if (playGlobalMusic) {
+        if (currentLevel === 6) {
+          playGlobalMusic('boss');
+        } else {
+          playGlobalMusic('campaign');
+        }
+      }
     }
   };
 
@@ -93,10 +112,28 @@ export default function CampaignScreen({ onGoBack }) {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={{ flex: 1, backgroundColor: '#1a1a2e', justifyContent: 'center', alignItems: 'center' }}>
+        <Pressable
+          style={{
+            position: 'absolute',
+            top: 50,
+            right: 20,
+            zIndex: 10,
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={openSettings}
+        >
+          <Text style={{ fontSize: 24, color: '#fff' }}>⚙️</Text>
+        </Pressable>
+
         <Text style={{ color: '#fff', fontSize: 24, marginBottom: 30 }}>Campagne</Text>
         {onGoBack && <Button title="Retour au menu" onPress={onGoBack} color="#ff4444" />}
-        <Text style={{ color: '#ccc', fontSize: 16, marginTop: 10 }}>Monde {world} : {campaign[`World_${world}`].world_name}</Text>
-        <Text style={{ color: '#ccc', fontSize: 16, marginTop: 5 }}>{campaign[`World_${world}`].world_description}</Text>
+        <Text style={{ color: '#ccc', fontSize: 16, marginTop: 10 }}>Monde {world} : {worldName}</Text>
+        <Text style={{ color: '#ccc', fontSize: 16, marginTop: 5 }}>{worldDescription}</Text>
         <Text style={{ color: '#ccc', fontSize: 16, marginTop: 10 }}>Niveau {level} : {campaign[`World_${world}`][`Level_${world}_${level}`].name}</Text>
         <Text style={{ color: '#ccc', fontSize: 16, marginTop: 10 }}>{campaign[`World_${world}`][`Level_${world}_${level}`].description}</Text>
 
@@ -185,6 +222,7 @@ export default function CampaignScreen({ onGoBack }) {
           </View>
         </Modal>
 
+        <SettingsModal />
       </View>
     </TouchableWithoutFeedback>
   );

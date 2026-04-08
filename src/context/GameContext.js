@@ -118,7 +118,10 @@ export function GameProvider({ children }) {
 
   const setGameWon = useCallback(() => {
     setWon(true);
-  }, []);
+    if (audio.playVictoryMusic) {
+      audio.playVictoryMusic();
+    }
+  }, [audio]);
 
   const setMusicVolume = useCallback((val) => {
     update('musicVolume', val);
@@ -155,6 +158,9 @@ export function GameProvider({ children }) {
     openSettings,
     closeSettings,
     updateConfig,
+    playGlobalMusic: audio.playGlobalMusic, // Expose to screens
+    playClick: audio.playClick,
+    playMiss: audio.playMiss,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
