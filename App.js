@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableWithoutFeedback, Pressable, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Pressable, StyleSheet } from 'react-native';
 import { GameProvider, useGame } from './src/context/GameContext';
 import ClickBar from './src/components/ClickBar';
 import BoostBar from './src/components/BoostBar';
@@ -162,24 +162,16 @@ function GameScreen({ onGoToCampaign }) {
 
    return (
     <TouchableWithoutFeedback onPress={() => { if (!settingsVisible) handleTap(); }} disabled={showShop}>
-     <View
-       style={{
-         flex: 1,
-         backgroundColor: "#1a1a2e",
-         justifyContent: "center",
-         alignItems: "center",
-         paddingHorizontal: 20,
-       }}
-     >
-       <View style={{ flexDirection: "row", alignItems: "baseline", marginBottom: 16 }}>
-         <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}>
+     <View style={styles.container}>
+       <View style={styles.headerRow}>
+         <Text style={styles.title}>
            SadisticAim
          </Text>
-         <Text style={{ color: "#9fb1c9", fontSize: 12, marginLeft: 8 }}>
+         <Text style={styles.pointsText}>
            Points: {Math.floor(points)}
          </Text>
          {passivePointsPerSec > 0 && (
-           <Text style={{ color: "#16a34a", fontSize: 11, marginLeft: 8 }}>
+           <Text style={styles.passiveText}>
              +{passivePointsPerSec.toFixed(1)}/sec
            </Text>
          )}
@@ -190,13 +182,10 @@ function GameScreen({ onGoToCampaign }) {
        </Pressable>
 
          <View
-           style={{
+           style={[styles.gameArea, {
              width: adjustedZoneWidth,
              height: adjustedZoneHeight,
-             borderWidth: 1,
-             borderColor: "#444",
-             overflow: "visible",
-           }}
+           }]}
          >
            <View
              pointerEvents="none"
@@ -206,7 +195,11 @@ function GameScreen({ onGoToCampaign }) {
                top: 0,
                width: TARGET_W,
                height: adjustedZoneHeight,
-               backgroundColor: "#FF4444",
+               backgroundColor: "#FF2A2A",
+               shadowColor: "#FF2A2A",
+               shadowOffset: { width:0, height:0 },
+               shadowOpacity: 0.8,
+               shadowRadius: 10,
              }}
            >
              <View
@@ -216,7 +209,11 @@ function GameScreen({ onGoToCampaign }) {
                  top: (adjustedZoneHeight - adjustedSweetH) / 2,
                  width: adjustedSweetW,
                  height: adjustedSweetH,
-                 backgroundColor: "#FFD700",
+                 backgroundColor: "#FFFFFF",
+                 shadowColor: "#FFFFFF",
+                 shadowOffset: { width:0, height:0 },
+                 shadowOpacity: 1,
+                 shadowRadius: 5,
                }}
              />
            </View>
@@ -228,29 +225,23 @@ function GameScreen({ onGoToCampaign }) {
           />
         </View>
 
-      <BoostBar value={boost} max={BOOST_MAX} />
-        <View style={{ marginTop: 20 }}>
-          <Button
-            onPress={onGoToCampaign}
-            title="Aller à la campagne"
-            color="#28a745"
-          />
-        </View>
+      <View style={styles.boostContainer}>
+        <BoostBar value={boost} max={BOOST_MAX} />
+      </View>
+        <View style={styles.actionContainer}>
+          <Pressable style={styles.campaignBtn} onPress={onGoToCampaign}>
+            <Text style={styles.campaignBtnText}>ALLER À LA CAMPAGNE</Text>
+          </Pressable>
 
-      <Pressable
-        onPress={() => setShowShop((value) => !value)}
-        style={{
-          marginTop: 16,
-          backgroundColor: "#2563eb",
-          borderRadius: 8,
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-        }}
-      >
-        <Text style={{ color: "#fff", fontWeight: "700" }}>
-          {showShop ? "Fermer le Shop" : "Accéder au Shop"}
-        </Text>
-      </Pressable>
+          <Pressable
+            onPress={() => setShowShop((value) => !value)}
+            style={styles.shopBtn}
+          >
+            <Text style={styles.shopBtnText}>
+              {showShop ? "FERMER LE QG" : "ACCÉDER AU QG (SHOP)"}
+            </Text>
+          </Pressable>
+        </View>
 
       {showShop ? (
         <Shop points={points} levels={shopLevels} onBuy={handleBuyUpgrade} />
@@ -276,22 +267,109 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-
-
-    settingsBtn: {
-        position: 'absolute',
-        top: 50,
-        right: 20,
-        zIndex: 10,
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    settingsIcon: {
-        fontSize: 24,
-        color: '#fff',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#0a0a16",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginBottom: 24,
+    backgroundColor: "rgba(20,20,35,0.8)",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  title: {
+    color: "#00ffff",
+    fontSize: 26,
+    fontWeight: "900",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    textShadowColor: "#00ffff",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowOpacity: 0.8,
+    textShadowRadius: 8,
+  },
+  pointsText: {
+    color: "#d0d0e0",
+    fontSize: 14,
+    marginLeft: 12,
+    fontWeight: "bold",
+  },
+  passiveText: {
+    color: "#00ff66",
+    fontSize: 12,
+    marginLeft: 8,
+    fontStyle: 'italic',
+  },
+  settingsBtn: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsIcon: {
+    fontSize: 22,
+    color: '#fff',
+  },
+  gameArea: {
+    borderWidth: 2,
+    borderColor: "#00ffff",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    overflow: "visible",
+    shadowColor: "#00ffff",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+  },
+  boostContainer: {
+    width: '100%',
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  actionContainer: {
+    marginTop: 30,
+    width: '100%',
+    gap: 15,
+  },
+  campaignBtn: {
+    backgroundColor: 'rgba(0,255,255,0.2)',
+    paddingVertical: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00ffff',
+    alignItems: 'center',
+  },
+  campaignBtnText: {
+    color: '#00ffff',
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  shopBtn: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingVertical: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#555',
+    alignItems: 'center',
+  },
+  shopBtnText: {
+    color: '#fff',
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
 });
