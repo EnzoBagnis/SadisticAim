@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClickBar from '../components/ClickBar';
 import BoostBar from '../components/BoostBar';
 import SettingsModal from '../components/SettingsModal';
 import { useGame } from '../context/GameContext';
 import campaign from '../../campain.json';
+import {
+  getTargetSpeed,
+  getBoostMissLoss,
+  getPointsPerHit,
+  getPointsSweetBonus,
+  getSweetZoneSize,
+  getZoneWidth,
+  getZoneHeight,
+  TARGET_SPEED as BASE_TARGET_SPEED,
+  BOOST_MISS as BASE_BOOST_MISS,
+  BOOST_HIT as BASE_BOOST_HIT,
+  BOOST_SWEET as BASE_BOOST_SWEET,
+  SWEET_W as BASE_SWEET_W,
+  SWEET_H as BASE_SWEET_H,
+  ZONE_W as BASE_ZONE_W,
+  ZONE_H as BASE_ZONE_H
+} from '../BaseVar';
 
 export default function CampaignScreen({ onGoBack }) {
   const {
@@ -22,7 +39,8 @@ export default function CampaignScreen({ onGoBack }) {
     openSettings,
     playVictoryMusic,
     playLoseMusic,
-    stopLoseMusic
+    stopLoseMusic,
+    shopLevels
   } = useGame();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -112,6 +130,21 @@ export default function CampaignScreen({ onGoBack }) {
       setLevelStartText(levelData.start_text);
 
       const { name, description, start_text, end_text, background, ...configUpdates } = levelData;
+
+      // Appliquer les bonus du shop sur les specs de base du niveau ou les valeurs par défaut
+      if (shopLevels) {
+        configUpdates.TARGET_SPEED = getTargetSpeed(configUpdates.TARGET_SPEED ?? BASE_TARGET_SPEED, shopLevels.slowTarget ?? 0);
+        configUpdates.BOOST_MISS = getBoostMissLoss(configUpdates.BOOST_MISS ?? BASE_BOOST_MISS, shopLevels.lessLoss ?? 0);
+        configUpdates.BOOST_HIT = getPointsPerHit(configUpdates.BOOST_HIT ?? BASE_BOOST_HIT, shopLevels.plusPoints ?? 0);
+        configUpdates.BOOST_SWEET = getPointsSweetBonus(configUpdates.BOOST_SWEET ?? BASE_BOOST_SWEET, shopLevels.betterBonus ?? 0);
+
+        configUpdates.SWEET_W = getSweetZoneSize(configUpdates.SWEET_W ?? BASE_SWEET_W, shopLevels.sweetZoneSize ?? 0);
+        configUpdates.SWEET_H = getSweetZoneSize(configUpdates.SWEET_H ?? BASE_SWEET_H, shopLevels.sweetZoneSize ?? 0);
+
+        configUpdates.ZONE_W = getZoneWidth(configUpdates.ZONE_W ?? BASE_ZONE_W, shopLevels.biggerZone ?? 0);
+        configUpdates.ZONE_H = getZoneHeight(configUpdates.ZONE_H ?? BASE_ZONE_H, shopLevels.biggerZone ?? 0);
+      }
+
       updateConfig(configUpdates);
       setOpponentProgress(0);
       setShowGameOverModal(false);
