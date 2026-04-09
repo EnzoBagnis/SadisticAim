@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClickBar from '../components/ClickBar';
 import BoostBar from '../components/BoostBar';
 import SettingsModal from '../components/SettingsModal';
@@ -23,6 +24,7 @@ export default function CampaignScreen({ onGoBack }) {
     openSettings
   } = useGame();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [level, setLevel] = useState(1);
   const [world, setWorld] = useState(1);
   const [levelName, setLevelName] = useState(campaign.World_1.Level_1_1.name);
@@ -53,8 +55,25 @@ export default function CampaignScreen({ onGoBack }) {
   const themeColor = getWorldColor(world);
 
   useEffect(() => {
-    // Initialize config for level 1
-    updateCampaign(level,world);
+    const loadCampaignProgress = async () => {
+      try {
+        const savedWorld = await AsyncStorage.getItem('@campaign_world');
+        const savedLevel = await AsyncStorage.getItem('@campaign_level');
+        const initialWorld = savedWorld ? parseInt(savedWorld, 10) : 1;
+        const initialLevel = savedLevel ? parseInt(savedLevel, 10) : 1;
+
+        setWorld(initialWorld);
+        setLevel(initialLevel);
+        updateCampaign(initialLevel, initialWorld);
+      } catch (error) {
+        console.error("Erreur de chargement de la campagne", error);
+        updateCampaign(1, 1);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCampaignProgress();
 
     // Fallback to main music when leaving CampaignScreen
     return () => {
@@ -63,6 +82,15 @@ export default function CampaignScreen({ onGoBack }) {
       }
     };
   }, []);
+
+  const saveCampaignProgress = async (newLevel, newWorld) => {
+    try {
+      await AsyncStorage.setItem('@campaign_level', newLevel.toString());
+      await AsyncStorage.setItem('@campaign_world', newWorld.toString());
+    } catch (error) {
+      console.error("Erreur de sauvegarde de la campagne", error);
+    }
+  };
 
   const updateCampaign = (currentLevel, world) => {
       const worldData = campaign[`World_${world}`];
@@ -142,7 +170,16 @@ export default function CampaignScreen({ onGoBack }) {
     setLevel(nextLevel);
     setWorld(nextWorld);
     updateCampaign(nextLevel, nextWorld);
+    saveCampaignProgress(nextLevel, nextWorld);
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#00ffff" />
+      </View>
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={onPress}>
@@ -195,6 +232,7 @@ export default function CampaignScreen({ onGoBack }) {
               setLevel(1);
               updateCampaign(1, newWorld);
               resetGame();
+              saveCampaignProgress(1, newWorld);
             }}
           >
             <Text style={{color: themeColor}}>{'< '}</Text>
@@ -208,6 +246,7 @@ export default function CampaignScreen({ onGoBack }) {
               setLevel(1);
               updateCampaign(1, newWorld);
               resetGame();
+              saveCampaignProgress(1, newWorld);
             }}
           >
             <Text style={{color: themeColor}}>{' >'}</Text>
