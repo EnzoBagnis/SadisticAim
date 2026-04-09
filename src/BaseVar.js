@@ -54,7 +54,7 @@ export const SHOP_ITEMS = [
     description: "Diminue la perte de points en cas d'echec.",
     maxLevel: 25,
     basePrice: 8,
-    priceFactor: 2,
+    priceFactor: 1.85,
   },
   {
     id: "betterBonus",
@@ -78,7 +78,7 @@ export const SHOP_ITEMS = [
     description: "Gagne 1 point par seconde au niveau 1.",
     maxLevel: 50,
     basePrice: 30,
-    priceFactor: 2.15,
+    priceFactor: 2,
   },
   {
     id: "biggerZone",
@@ -105,8 +105,8 @@ export const getShopPrice = (item, level) => {
 
 // Upgrade impact calculations
 export const getPointsPerHit = (basePoints, plusPointsLevel) => {
-  // +100% par niveau
-  return Math.round(basePoints * Math.pow(2, plusPointsLevel));
+  // +40% par niveau
+  return Math.round(basePoints * Math.pow(1.4, plusPointsLevel));
 };
 
 export const getPointsSweetBonus = (basePoints, betterBonusLevel) => {
@@ -125,18 +125,13 @@ export const getBoostMissLoss = (baseLoss, lessLossLevel) => {
 };
 
 export const getSweetZoneSize = (baseSize, sweetZoneLevelSize) => {
-  // +8% par niveau
-  return baseSize * Math.pow(1.08, sweetZoneLevelSize);
+  // +1% par niveau
+  return baseSize * Math.pow(1.01, sweetZoneLevelSize);
 };
 
 export const getPassivePoints = (passivePointsLevel) => {
-  // 1 point par seconde au niveau 1, +5% par niveau
-  return passivePointsLevel * Math.pow(1.05, passivePointsLevel - 1);
-};
-
-export const getZoneWidth = (baseWidth, biggerZoneLevel) => {
-  // +5% par niveau
-  return baseWidth * Math.pow(1.05, biggerZoneLevel);
+  // 1 point par seconde au niveau 1, +50% par niveau
+  return passivePointsLevel * Math.pow(1.5, passivePointsLevel - 1);
 };
 
 export const getZoneHeight = (baseHeight, biggerZoneLevel) => {
@@ -145,7 +140,7 @@ export const getZoneHeight = (baseHeight, biggerZoneLevel) => {
 };
 
 export const getTargetMovementZone = (baseZone, smallerTargetZoneLevel) => {
-  // -4% par niveau (réduit la zone de déplacement)
-  return baseZone * Math.pow(0.96, smallerTargetZoneLevel);
+  // -2% par niveau (réduit la zone de déplacement)
+  return baseZone * Math.pow(0.98, smallerTargetZoneLevel);
 };
 
