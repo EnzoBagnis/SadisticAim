@@ -125,13 +125,18 @@ export const getBoostMissLoss = (baseLoss, lessLossLevel) => {
 };
 
 export const getSweetZoneSize = (baseSize, sweetZoneLevelSize) => {
-  // +1% par niveau
-  return baseSize * Math.pow(1.01, sweetZoneLevelSize);
+  // +4% par niveau
+  return baseSize * Math.pow(1.04, sweetZoneLevelSize);
 };
 
 export const getPassivePoints = (passivePointsLevel) => {
   // 1 point par seconde au niveau 1, +50% par niveau
   return passivePointsLevel * Math.pow(1.5, passivePointsLevel - 1);
+};
+
+export const getZoneWidth = (baseWidth, biggerZoneLevel) => {
+  // +0% par niveau
+  return baseWidth * Math.pow(1, biggerZoneLevel);
 };
 
 export const getZoneHeight = (baseHeight, biggerZoneLevel) => {
