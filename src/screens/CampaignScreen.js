@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClickBar from '../components/ClickBar';
 import BoostBar from '../components/BoostBar';
 import SettingsModal from '../components/SettingsModal';
 import { useGame } from '../context/GameContext';
 import campaign from '../../campain.json';
-
-const { width } = Dimensions.get('window');
 
 export default function CampaignScreen({ onGoBack }) {
   const {
@@ -21,7 +19,8 @@ export default function CampaignScreen({ onGoBack }) {
     boost,
     setGameWon,
     playGlobalMusic,
-    openSettings
+    openSettings,
+    playVictoryMusic
   } = useGame();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -36,8 +35,13 @@ export default function CampaignScreen({ onGoBack }) {
   const [showEndTextModal, setShowEndTextModal] = useState(false);
   const [showStartTextModal, setShowStartTextModal] = useState(false);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [showKonamiModal, setShowKonamiModal] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [opponentProgress, setOpponentProgress] = useState(0);
+
+  const konamiSequence = ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R'];
+  const konamiIndex = React.useRef(0);
+  const lastKonamiTime = React.useRef(0);
 
   const { ZONE_W, ZONE_H, TARGET_W, TARGET_H, SWEET_W, SWEET_H, BOOST_MAX, BOOST_DRAIN } = config;
 
@@ -109,9 +113,9 @@ export default function CampaignScreen({ onGoBack }) {
       setOpponentProgress(0);
       setShowGameOverModal(false);
 
-      // Play boss music if it's the 6th level (last level of the world), else play campaign music
+      // Jouer la musique correcte
       if (playGlobalMusic) {
-        if (currentLevel === 6) {
+        if (currentLevel % 6 === 0) {
           playGlobalMusic('boss');
         } else {
           playGlobalMusic('campaign');
@@ -126,21 +130,74 @@ export default function CampaignScreen({ onGoBack }) {
       setOpponentProgress((p) => {
         // L'adversaire avance en fonction de la difficulté (drain)
         const speed = (BOOST_DRAIN || 1) * 0.2;
-        const newProgress = Math.min(100, p + speed);
-        if (newProgress >= 100) {
-           setShowGameOverModal(true);
-        }
-        return newProgress;
+        return Math.min(100, p + speed);
       });
     }, 100);
     return () => clearInterval(interval);
-  }, [showStartTextModal, showEndTextModal, showGameOverModal, BOOST_DRAIN]);
+  }, [showStartTextModal, showEndTextModal, showGameOverModal, BOOST_DRAIN, opponentProgress]);
+
+  useEffect(() => {
+    if (opponentProgress >= 100 && !showGameOverModal && !showStartTextModal && !showEndTextModal) {
+      setShowGameOverModal(true);
+    }
+  }, [opponentProgress, showGameOverModal, showStartTextModal, showEndTextModal]);
+
+  const getDirection = (x, y, w, h) => {
+    // Marges représentant la zone d'activation (33% du bord)
+    const marginX = w * 1.00;
+    const marginY = h * 0.33;
+
+    const dx = x - w / 2;
+    const dy = y - h / 2;
+
+    // Détermine si on est plus proche d'un bord horizontal ou vertical
+    if (Math.abs(dx) / w > Math.abs(dy) / h) {
+      // Vérifie si on est dans la marge du bord (gauche ou droite)
+      if (Math.abs(dx) > w / 2 - marginX) {
+        return dx < 0 ? 'L' : 'R';
+      }
+    } else {
+      // Vérifie si on est dans la marge du bord (haut ou bas)
+      if (Math.abs(dy) > h / 2 - marginY) {
+        return dy < 0 ? 'U' : 'D';
+      }
+    }
+    // Si on est au centre (hors des marges), on ne valide aucune direction
+    return null;
+  };
 
   const onPress = () => {
-    if (showStartTextModal || showEndTextModal || showGameOverModal) return;
+    if (showStartTextModal || showEndTextModal || showGameOverModal || showKonamiModal) return;
+
+    const now = Date.now();
+    if (now - lastKonamiTime.current > 2500) {
+      konamiIndex.current = 0; // Réinitialise si plus de 2.5s entre chaque clic
+    }
+
+    const dir = getDirection(cursorX, cursorY, ZONE_W, ZONE_H);
+
+    if (dir) {
+      if (dir === konamiSequence[konamiIndex.current]) {
+        konamiIndex.current++;
+        lastKonamiTime.current = now;
+        if (konamiIndex.current === konamiSequence.length) {
+          setShowKonamiModal(true);
+          konamiIndex.current = 0;
+        }
+      } else {
+        if (dir === konamiSequence[0]) {
+          konamiIndex.current = 1;
+          lastKonamiTime.current = now;
+        } else {
+          konamiIndex.current = 0;
+        }
+      }
+    }
+
     const isWin = handleTap();
     if (isWin) {
       setGameWon();
+      if (playVictoryMusic) playVictoryMusic();
       setShowEndTextModal(true);
     }
   };
@@ -167,6 +224,13 @@ export default function CampaignScreen({ onGoBack }) {
         nextWorld = world;
         nextLevel = level + 1;
     }
+
+    // Si le monde suivant n'existe pas, on recommence au premier niveau (Fin de la campagne)
+    if (!campaign[`World_${nextWorld}`]) {
+      nextWorld = 1;
+      nextLevel = 1;
+    }
+
     setLevel(nextLevel);
     setWorld(nextWorld);
     updateCampaign(nextLevel, nextWorld);
@@ -265,7 +329,7 @@ export default function CampaignScreen({ onGoBack }) {
 
             {/* Curseur Adversaire */}
             <View style={[styles.racerIcon, { left: `${opponentProgress}%`, backgroundColor: '#ff4444', bottom: 5 }]}>
-              <Text style={styles.racerLabel}>RIVAL</Text>
+              <Text style={styles.racerLabel}>{level % 6 === 0 ? 'BOSS' : 'ENNEMI'}</Text>
             </View>
           </View>
         </View>
@@ -333,17 +397,30 @@ export default function CampaignScreen({ onGoBack }) {
           </View>
         </Modal>
 
-        <Modal visible={showGameOverModal} transparent={true} animationType="zoomIn">
+        <Modal visible={showGameOverModal} transparent={true} animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { borderColor: '#ff003c', backgroundColor: '#1a0006' }]}>
               <Text style={[styles.modalTitle, { color: '#ff003c', textShadowColor: '#ff003c' }]}>ÉCHEC CRITIQUE</Text>
-              <Text style={[styles.modalText, { color: '#ffcccc' }]}>Le Rival a atteint la ligne d'arrivée avant vous. Le système s'effondre.</Text>
+              <Text style={[styles.modalText, { color: '#ffcccc' }]}>{level % 6 === 0 ? 'Le boss' : 'L\'ennemi'} a atteint la ligne d'arrivée avant vous. Le système s'effondre.</Text>
               <Pressable style={[styles.modalBtn, { backgroundColor: '#ff003c', marginTop: 20 }]} onPress={() => {
                 setShowGameOverModal(false);
                 resetGame();
                 setOpponentProgress(0);
+                updateCampaign(level, world);
               }}>
                 <Text style={[styles.modalBtnText, { color: '#fff' }]}>Relancer la simulation</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={showKonamiModal} transparent={true} animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { borderColor: '#ffd700' }]}>
+              <Text style={[styles.modalTitle, { color: '#ffd700', textShadowColor: '#ffd700' }]}>CODE SECRET</Text>
+              <Text style={styles.modalText}>Félicitations, vous avez trouvé le Konami code ! (En attente d'une fonctionnalité...)</Text>
+              <Pressable style={[styles.modalBtn, { backgroundColor: '#ffd700' }]} onPress={() => setShowKonamiModal(false)}>
+                <Text style={styles.modalBtnText}>Fermer</Text>
               </Pressable>
             </View>
           </View>
