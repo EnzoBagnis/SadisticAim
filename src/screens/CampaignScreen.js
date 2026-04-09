@@ -56,6 +56,7 @@ export default function CampaignScreen({ onGoBack }) {
   const [showStartTextModal, setShowStartTextModal] = useState(false);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [showKonamiModal, setShowKonamiModal] = useState(false);
+  const [showCampaignEndModal, setShowCampaignEndModal] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [opponentProgress, setOpponentProgress] = useState(0);
   const [konamiActivated, setKonamiActivated] = useState(false);
@@ -242,6 +243,13 @@ export default function CampaignScreen({ onGoBack }) {
 
   const handleEndTextContinue = () => {
     setShowEndTextModal(false);
+
+    // Check if it's the end of world 5 boss
+    if (world === 5 && level === 6) {
+      setShowCampaignEndModal(true);
+      return;
+    }
+
     setShowStartTextModal(true);
     setCanProceed(false);
     setTimeout(() => {
@@ -263,10 +271,10 @@ export default function CampaignScreen({ onGoBack }) {
         nextLevel = level + 1;
     }
 
-    // Si le monde suivant n'existe pas, on recommence au premier niveau (Fin de la campagne)
+    // Si le monde suivant n'existe pas, c'est la fin de la campagne
     if (!campaign[`World_${nextWorld}`]) {
-      nextWorld = 1;
-      nextLevel = 1;
+      setShowCampaignEndModal(true);
+      return;
     }
 
     setLevel(nextLevel);
@@ -325,6 +333,7 @@ export default function CampaignScreen({ onGoBack }) {
           <Text style={styles.descText}>{campaign[`World_${world}`]?.[`Level_${world}_${level}`]?.description}</Text>
         </View>
 
+          {/*
         <View style={styles.navRow}>
           <Pressable
             style={[styles.navBtn, { borderColor: themeColor }]}
@@ -354,6 +363,7 @@ export default function CampaignScreen({ onGoBack }) {
             <Text style={{color: themeColor}}>{' >'}</Text>
           </Pressable>
         </View>
+           */}
 
         <View style={styles.raceContainer}>
           <Text style={[styles.raceTitle, { color: themeColor }]}>Progression de la Course</Text>
@@ -460,6 +470,26 @@ export default function CampaignScreen({ onGoBack }) {
               <Text style={styles.modalText}>Félicitations, vous avez trouvé le Konami code !</Text>
               <Pressable style={[styles.modalBtn, { backgroundColor: '#ffd700' }]} onPress={() => setShowKonamiModal(false)}>
                 <Text style={styles.modalBtnText}>Fermer</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={showCampaignEndModal} transparent={true} animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { borderColor: '#ffd700' }]}>
+              <Text style={[styles.modalTitle, { color: '#ffd700', textShadowColor: '#ffd700' }]}>SIMULATION TERMINÉE</Text>
+              <Text style={styles.modalText}>Vous avez vaincu tous les adversaires et purgé le système. L'univers est sauf.</Text>
+              <Pressable style={[styles.modalBtn, { backgroundColor: '#ffd700', marginTop: 20 }]} onPress={() => {
+                setShowCampaignEndModal(false);
+                setLevel(1);
+                setWorld(1);
+                updateCampaign(1, 1);
+                saveCampaignProgress(1, 1);
+                if (playGlobalMusic) playGlobalMusic('main');
+                if (onGoBack) onGoBack();
+              }}>
+                <Text style={styles.modalBtnText}>Retour au QG</Text>
               </Pressable>
             </View>
           </View>
