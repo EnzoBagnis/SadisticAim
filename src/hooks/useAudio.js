@@ -7,6 +7,8 @@ const missSource = require('../../assets/sounds/miss.mp3');
 const campaignMusicSource = require('../../assets/sounds/campaign_music.mp3');
 const bossMusicSource = require('../../assets/sounds/boss_music.mp3');
 const victoryMusicSource = require('../../assets/sounds/victory_music.mp3');
+const loseMusicSource = require('../../assets/sounds/lose_music.mp3');
+const loseSecretMusicSource = require('../../assets/sounds/lose_secret_music.mp3');
 
 export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume) {
   const soundVolumeRef = useRef(initialSoundVolume);
@@ -20,6 +22,8 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
   const campaignMusicPlayerRef = useRef(null);
   const bossMusicPlayerRef = useRef(null);
   const victoryMusicPlayerRef = useRef(null);
+  const loseMusicPlayerRef = useRef(null);
+  const loseSecretMusicPlayerRef = useRef(null);
 
   const currentPlayingMusic = useRef(null);
 
@@ -34,6 +38,8 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
       const { sound: campaignSound } = await Audio.Sound.createAsync(campaignMusicSource, { isLooping: true, volume: initialMusicVolume });
       const { sound: bossSound } = await Audio.Sound.createAsync(bossMusicSource, { isLooping: true, volume: initialMusicVolume });
       const { sound: victorySound } = await Audio.Sound.createAsync(victoryMusicSource, { volume: initialMusicVolume });
+      const { sound: loseSound } = await Audio.Sound.createAsync(loseMusicSource, { volume: initialMusicVolume });
+      const { sound: loseSecretSound } = await Audio.Sound.createAsync(loseSecretMusicSource, { volume: initialMusicVolume });
 
       musicPlayerRef.current = musicSound;
       clickPlayerRef.current = clickSound;
@@ -41,6 +47,8 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
       campaignMusicPlayerRef.current = campaignSound;
       bossMusicPlayerRef.current = bossSound;
       victoryMusicPlayerRef.current = victorySound;
+      loseMusicPlayerRef.current = loseSound;
+      loseSecretMusicPlayerRef.current = loseSecretSound;
 
       setSoundsReady(true);
     }
@@ -54,6 +62,8 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
       if (campaignMusicPlayerRef.current) campaignMusicPlayerRef.current.unloadAsync();
       if (bossMusicPlayerRef.current) bossMusicPlayerRef.current.unloadAsync();
       if (victoryMusicPlayerRef.current) victoryMusicPlayerRef.current.unloadAsync();
+      if (loseMusicPlayerRef.current) loseMusicPlayerRef.current.unloadAsync();
+      if (loseSecretMusicPlayerRef.current) loseSecretMusicPlayerRef.current.unloadAsync();
     };
   }, []); // Keep empty array so it only loads once
 
@@ -66,6 +76,8 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
         if (campaignMusicPlayerRef.current) await campaignMusicPlayerRef.current.setVolumeAsync(initialMusicVolume);
         if (bossMusicPlayerRef.current) await bossMusicPlayerRef.current.setVolumeAsync(initialMusicVolume);
         if (victoryMusicPlayerRef.current) await victoryMusicPlayerRef.current.setVolumeAsync(initialMusicVolume);
+        if (loseMusicPlayerRef.current) await loseMusicPlayerRef.current.setVolumeAsync(initialMusicVolume);
+        if (loseSecretMusicPlayerRef.current) await loseSecretMusicPlayerRef.current.setVolumeAsync(initialMusicVolume);
 
         if (clickPlayerRef.current) await clickPlayerRef.current.setVolumeAsync(initialSoundVolume);
         if (missPlayerRef.current) await missPlayerRef.current.setVolumeAsync(initialSoundVolume);
@@ -136,6 +148,30 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
 
   }, []);
 
+  const playLoseMusic = useCallback(async (secret = false) => {
+    const player = secret ? loseSecretMusicPlayerRef.current : loseMusicPlayerRef.current;
+    if (musicVolumeRef.current <= 0 || !player) return;
+
+    await stopCurrentMusic();
+    currentPlayingMusic.current = player;
+    await player.setPositionAsync(0);
+    await player.playAsync();
+  }, []);
+
+  const stopLoseMusic = useCallback(async () => {
+    const losePlayer = loseMusicPlayerRef.current;
+    const loseSecretPlayer = loseSecretMusicPlayerRef.current;
+
+    if (losePlayer) {
+      const status = await losePlayer.getStatusAsync();
+      if (status.isLoaded && status.isPlaying) await losePlayer.stopAsync();
+    }
+    if (loseSecretPlayer) {
+      const status = await loseSecretPlayer.getStatusAsync();
+      if (status.isLoaded && status.isPlaying) await loseSecretPlayer.stopAsync();
+    }
+  }, []);
+
   const playClick = useCallback(async () => {
     if (soundVolumeRef.current <= 0 || !clickPlayerRef.current) return;
     await clickPlayerRef.current.setPositionAsync(0);
@@ -183,6 +219,8 @@ export function useAudio(settingsLoaded, initialMusicVolume, initialSoundVolume)
       setMusicVolume,
       setSoundVolume,
       playGlobalMusic,
-      playVictoryMusic
+      playVictoryMusic,
+      playLoseMusic,
+      stopLoseMusic
   };
 }

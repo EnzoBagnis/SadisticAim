@@ -166,9 +166,12 @@ export function GameProvider({ children }) {
     audio.setSoundVolume(val);
   }, [audio, update]);
 
+  const gyroRecalibrateRef = useRef(gyro.recalibrate);
+  gyroRecalibrateRef.current = gyro.recalibrate;
+
   const recalibrate = useCallback(() => {
-    gyro.recalibrate();
-  }, [gyro]);
+    gyroRecalibrateRef.current();
+  }, []);
 
   const openSettings = useCallback(() => setSettingsVisible(true), []);
   const closeSettings = useCallback(() => setSettingsVisible(false), []);
@@ -197,6 +200,8 @@ export function GameProvider({ children }) {
     updateConfig,
     playGlobalMusic: audio.playGlobalMusic, // Expose to screens
     playVictoryMusic: audio.playVictoryMusic,
+    playLoseMusic: audio.playLoseMusic,
+    stopLoseMusic: audio.stopLoseMusic,
     playClick: audio.playClick,
     playMiss: audio.playMiss,
   };

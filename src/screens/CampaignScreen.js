@@ -20,7 +20,9 @@ export default function CampaignScreen({ onGoBack }) {
     setGameWon,
     playGlobalMusic,
     openSettings,
-    playVictoryMusic
+    playVictoryMusic,
+    playLoseMusic,
+    stopLoseMusic
   } = useGame();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +40,7 @@ export default function CampaignScreen({ onGoBack }) {
   const [showKonamiModal, setShowKonamiModal] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [opponentProgress, setOpponentProgress] = useState(0);
+  const [konamiActivated, setKonamiActivated] = useState(false);
 
   const konamiSequence = ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R'];
   const konamiIndex = React.useRef(0);
@@ -139,6 +142,7 @@ export default function CampaignScreen({ onGoBack }) {
   useEffect(() => {
     if (opponentProgress >= 100 && !showGameOverModal && !showStartTextModal && !showEndTextModal) {
       setShowGameOverModal(true);
+      if (playLoseMusic) playLoseMusic(konamiActivated);
     }
   }, [opponentProgress, showGameOverModal, showStartTextModal, showEndTextModal]);
 
@@ -181,6 +185,7 @@ export default function CampaignScreen({ onGoBack }) {
         konamiIndex.current++;
         lastKonamiTime.current = now;
         if (konamiIndex.current === konamiSequence.length) {
+          setKonamiActivated(true);
           setShowKonamiModal(true);
           konamiIndex.current = 0;
         }
@@ -404,6 +409,7 @@ export default function CampaignScreen({ onGoBack }) {
               <Text style={[styles.modalText, { color: '#ffcccc' }]}>{level % 6 === 0 ? 'Le boss' : 'L\'ennemi'} a atteint la ligne d'arrivée avant vous. Le système s'effondre.</Text>
               <Pressable style={[styles.modalBtn, { backgroundColor: '#ff003c', marginTop: 20 }]} onPress={() => {
                 setShowGameOverModal(false);
+                if (stopLoseMusic) stopLoseMusic();
                 resetGame();
                 setOpponentProgress(0);
                 updateCampaign(level, world);
@@ -418,7 +424,7 @@ export default function CampaignScreen({ onGoBack }) {
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { borderColor: '#ffd700' }]}>
               <Text style={[styles.modalTitle, { color: '#ffd700', textShadowColor: '#ffd700' }]}>CODE SECRET</Text>
-              <Text style={styles.modalText}>Félicitations, vous avez trouvé le Konami code ! (En attente d'une fonctionnalité...)</Text>
+              <Text style={styles.modalText}>Félicitations, vous avez trouvé le Konami code !</Text>
               <Pressable style={[styles.modalBtn, { backgroundColor: '#ffd700' }]} onPress={() => setShowKonamiModal(false)}>
                 <Text style={styles.modalBtnText}>Fermer</Text>
               </Pressable>
