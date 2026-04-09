@@ -282,7 +282,7 @@ export default function CampaignScreen({ onGoBack }) {
           <Text style={styles.descText} numberOfLines={2}>{worldDescription}</Text>
           <View style={styles.separator} />
           <Text style={styles.levelTitle}>
-            Niveau {level} : {levelName}
+            {level === 6 ? 'BOSS' : `Niveau ${level}`} : {levelName}
           </Text>
           <Text style={styles.descText}>{campaign[`World_${world}`]?.[`Level_${world}_${level}`]?.description}</Text>
         </View>
