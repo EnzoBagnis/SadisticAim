@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Pressable, Modal, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClickBar from '../components/ClickBar';
 import BoostBar from '../components/BoostBar';
 import SettingsModal from '../components/SettingsModal';
 import { useGame } from '../context/GameContext';
 import campaign from '../../campain.json';
-
-const { width } = Dimensions.get('window');
 
 export default function CampaignScreen({ onGoBack }) {
   const {
@@ -20,9 +19,11 @@ export default function CampaignScreen({ onGoBack }) {
     boost,
     setGameWon,
     playGlobalMusic,
-    openSettings
+    openSettings,
+    playVictoryMusic
   } = useGame();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [level, setLevel] = useState(1);
   const [world, setWorld] = useState(1);
   const [levelName, setLevelName] = useState(campaign.World_1.Level_1_1.name);
@@ -34,8 +35,13 @@ export default function CampaignScreen({ onGoBack }) {
   const [showEndTextModal, setShowEndTextModal] = useState(false);
   const [showStartTextModal, setShowStartTextModal] = useState(false);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [showKonamiModal, setShowKonamiModal] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
   const [opponentProgress, setOpponentProgress] = useState(0);
+
+  const konamiSequence = ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R'];
+  const konamiIndex = React.useRef(0);
+  const lastKonamiTime = React.useRef(0);
 
   const { ZONE_W, ZONE_H, TARGET_W, TARGET_H, SWEET_W, SWEET_H, BOOST_MAX, BOOST_DRAIN } = config;
 
@@ -53,8 +59,25 @@ export default function CampaignScreen({ onGoBack }) {
   const themeColor = getWorldColor(world);
 
   useEffect(() => {
-    // Initialize config for level 1
-    updateCampaign(level,world);
+    const loadCampaignProgress = async () => {
+      try {
+        const savedWorld = await AsyncStorage.getItem('@campaign_world');
+        const savedLevel = await AsyncStorage.getItem('@campaign_level');
+        const initialWorld = savedWorld ? parseInt(savedWorld, 10) : 1;
+        const initialLevel = savedLevel ? parseInt(savedLevel, 10) : 1;
+
+        setWorld(initialWorld);
+        setLevel(initialLevel);
+        updateCampaign(initialLevel, initialWorld);
+      } catch (error) {
+        console.error("Erreur de chargement de la campagne", error);
+        updateCampaign(1, 1);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCampaignProgress();
 
     // Fallback to main music when leaving CampaignScreen
     return () => {
@@ -63,6 +86,15 @@ export default function CampaignScreen({ onGoBack }) {
       }
     };
   }, []);
+
+  const saveCampaignProgress = async (newLevel, newWorld) => {
+    try {
+      await AsyncStorage.setItem('@campaign_level', newLevel.toString());
+      await AsyncStorage.setItem('@campaign_world', newWorld.toString());
+    } catch (error) {
+      console.error("Erreur de sauvegarde de la campagne", error);
+    }
+  };
 
   const updateCampaign = (currentLevel, world) => {
       const worldData = campaign[`World_${world}`];
@@ -81,9 +113,9 @@ export default function CampaignScreen({ onGoBack }) {
       setOpponentProgress(0);
       setShowGameOverModal(false);
 
-      // Play boss music if it's the 6th level (last level of the world), else play campaign music
+      // Jouer la musique correcte
       if (playGlobalMusic) {
-        if (currentLevel === 6) {
+        if (currentLevel % 6 === 0) {
           playGlobalMusic('boss');
         } else {
           playGlobalMusic('campaign');
@@ -98,21 +130,74 @@ export default function CampaignScreen({ onGoBack }) {
       setOpponentProgress((p) => {
         // L'adversaire avance en fonction de la difficulté (drain)
         const speed = (BOOST_DRAIN || 1) * 0.2;
-        const newProgress = Math.min(100, p + speed);
-        if (newProgress >= 100) {
-           setShowGameOverModal(true);
-        }
-        return newProgress;
+        return Math.min(100, p + speed);
       });
     }, 100);
     return () => clearInterval(interval);
-  }, [showStartTextModal, showEndTextModal, showGameOverModal, BOOST_DRAIN]);
+  }, [showStartTextModal, showEndTextModal, showGameOverModal, BOOST_DRAIN, opponentProgress]);
+
+  useEffect(() => {
+    if (opponentProgress >= 100 && !showGameOverModal && !showStartTextModal && !showEndTextModal) {
+      setShowGameOverModal(true);
+    }
+  }, [opponentProgress, showGameOverModal, showStartTextModal, showEndTextModal]);
+
+  const getDirection = (x, y, w, h) => {
+    // Marges représentant la zone d'activation (33% du bord)
+    const marginX = w * 1.00;
+    const marginY = h * 0.33;
+
+    const dx = x - w / 2;
+    const dy = y - h / 2;
+
+    // Détermine si on est plus proche d'un bord horizontal ou vertical
+    if (Math.abs(dx) / w > Math.abs(dy) / h) {
+      // Vérifie si on est dans la marge du bord (gauche ou droite)
+      if (Math.abs(dx) > w / 2 - marginX) {
+        return dx < 0 ? 'L' : 'R';
+      }
+    } else {
+      // Vérifie si on est dans la marge du bord (haut ou bas)
+      if (Math.abs(dy) > h / 2 - marginY) {
+        return dy < 0 ? 'U' : 'D';
+      }
+    }
+    // Si on est au centre (hors des marges), on ne valide aucune direction
+    return null;
+  };
 
   const onPress = () => {
-    if (showStartTextModal || showEndTextModal || showGameOverModal) return;
+    if (showStartTextModal || showEndTextModal || showGameOverModal || showKonamiModal) return;
+
+    const now = Date.now();
+    if (now - lastKonamiTime.current > 2500) {
+      konamiIndex.current = 0; // Réinitialise si plus de 2.5s entre chaque clic
+    }
+
+    const dir = getDirection(cursorX, cursorY, ZONE_W, ZONE_H);
+
+    if (dir) {
+      if (dir === konamiSequence[konamiIndex.current]) {
+        konamiIndex.current++;
+        lastKonamiTime.current = now;
+        if (konamiIndex.current === konamiSequence.length) {
+          setShowKonamiModal(true);
+          konamiIndex.current = 0;
+        }
+      } else {
+        if (dir === konamiSequence[0]) {
+          konamiIndex.current = 1;
+          lastKonamiTime.current = now;
+        } else {
+          konamiIndex.current = 0;
+        }
+      }
+    }
+
     const isWin = handleTap();
     if (isWin) {
       setGameWon();
+      if (playVictoryMusic) playVictoryMusic();
       setShowEndTextModal(true);
     }
   };
@@ -139,10 +224,26 @@ export default function CampaignScreen({ onGoBack }) {
         nextWorld = world;
         nextLevel = level + 1;
     }
+
+    // Si le monde suivant n'existe pas, on recommence au premier niveau (Fin de la campagne)
+    if (!campaign[`World_${nextWorld}`]) {
+      nextWorld = 1;
+      nextLevel = 1;
+    }
+
     setLevel(nextLevel);
     setWorld(nextWorld);
     updateCampaign(nextLevel, nextWorld);
+    saveCampaignProgress(nextLevel, nextWorld);
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#00ffff" />
+      </View>
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={onPress}>
@@ -181,7 +282,7 @@ export default function CampaignScreen({ onGoBack }) {
           <Text style={styles.descText} numberOfLines={2}>{worldDescription}</Text>
           <View style={styles.separator} />
           <Text style={styles.levelTitle}>
-            Niveau {level} : {levelName}
+            {level === 6 ? 'BOSS' : `Niveau ${level}`} : {levelName}
           </Text>
           <Text style={styles.descText}>{campaign[`World_${world}`]?.[`Level_${world}_${level}`]?.description}</Text>
         </View>
@@ -195,6 +296,7 @@ export default function CampaignScreen({ onGoBack }) {
               setLevel(1);
               updateCampaign(1, newWorld);
               resetGame();
+              saveCampaignProgress(1, newWorld);
             }}
           >
             <Text style={{color: themeColor}}>{'< '}</Text>
@@ -208,6 +310,7 @@ export default function CampaignScreen({ onGoBack }) {
               setLevel(1);
               updateCampaign(1, newWorld);
               resetGame();
+              saveCampaignProgress(1, newWorld);
             }}
           >
             <Text style={{color: themeColor}}>{' >'}</Text>
@@ -226,7 +329,7 @@ export default function CampaignScreen({ onGoBack }) {
 
             {/* Curseur Adversaire */}
             <View style={[styles.racerIcon, { left: `${opponentProgress}%`, backgroundColor: '#ff4444', bottom: 5 }]}>
-              <Text style={styles.racerLabel}>RIVAL</Text>
+              <Text style={styles.racerLabel}>{level % 6 === 0 ? 'BOSS' : 'ENNEMI'}</Text>
             </View>
           </View>
         </View>
@@ -294,17 +397,30 @@ export default function CampaignScreen({ onGoBack }) {
           </View>
         </Modal>
 
-        <Modal visible={showGameOverModal} transparent={true} animationType="zoomIn">
+        <Modal visible={showGameOverModal} transparent={true} animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { borderColor: '#ff003c', backgroundColor: '#1a0006' }]}>
               <Text style={[styles.modalTitle, { color: '#ff003c', textShadowColor: '#ff003c' }]}>ÉCHEC CRITIQUE</Text>
-              <Text style={[styles.modalText, { color: '#ffcccc' }]}>Le Rival a atteint la ligne d'arrivée avant vous. Le système s'effondre.</Text>
+              <Text style={[styles.modalText, { color: '#ffcccc' }]}>{level % 6 === 0 ? 'Le boss' : 'L\'ennemi'} a atteint la ligne d'arrivée avant vous. Le système s'effondre.</Text>
               <Pressable style={[styles.modalBtn, { backgroundColor: '#ff003c', marginTop: 20 }]} onPress={() => {
                 setShowGameOverModal(false);
                 resetGame();
                 setOpponentProgress(0);
+                updateCampaign(level, world);
               }}>
                 <Text style={[styles.modalBtnText, { color: '#fff' }]}>Relancer la simulation</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={showKonamiModal} transparent={true} animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { borderColor: '#ffd700' }]}>
+              <Text style={[styles.modalTitle, { color: '#ffd700', textShadowColor: '#ffd700' }]}>CODE SECRET</Text>
+              <Text style={styles.modalText}>Félicitations, vous avez trouvé le Konami code ! (En attente d'une fonctionnalité...)</Text>
+              <Pressable style={[styles.modalBtn, { backgroundColor: '#ffd700' }]} onPress={() => setShowKonamiModal(false)}>
+                <Text style={styles.modalBtnText}>Fermer</Text>
               </Pressable>
             </View>
           </View>

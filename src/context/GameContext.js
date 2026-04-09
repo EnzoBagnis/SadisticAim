@@ -3,6 +3,8 @@ import { Dimensions } from 'react-native';
 import { useGyroscope } from '../hooks/useGyroscope';
 import { useAudio } from '../hooks/useAudio';
 import { useSettings } from '../hooks/useSettings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STARTING_POINTS } from '../BaseVar';
 
 // --- Constantes de jeu (lecture seule) ---
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -40,6 +42,37 @@ export function GameProvider({ children }) {
   const [targetX, setTargetX] = useState(ZONE_W / 2 - currentConfig.TARGET_W / 2);
   const targetXRef = useRef(ZONE_W / 2 - currentConfig.TARGET_W / 2);
   const dirRef = useRef(1);
+
+  const [points, setPoints] = useState(STARTING_POINTS);
+  const [shopLevels, setShopLevels] = useState({});
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const savedPoints = await AsyncStorage.getItem('@shop_points');
+        const savedLevels = await AsyncStorage.getItem('@shop_levels');
+        if (savedPoints !== null) setPoints(parseFloat(savedPoints));
+        if (savedLevels !== null) setShopLevels(JSON.parse(savedLevels));
+      } catch (e) {
+        console.error('Failed to load shop data', e);
+      }
+    };
+    loadData();
+  }, []);
+
+  const updatePoints = useCallback(async (newPoints) => {
+    setPoints(newPoints);
+    try {
+      await AsyncStorage.setItem('@shop_points', newPoints.toString());
+    } catch (e) {}
+  }, []);
+
+  const updateShopLevels = useCallback(async (newLevels) => {
+    setShopLevels(newLevels);
+    try {
+      await AsyncStorage.setItem('@shop_levels', JSON.stringify(newLevels));
+    } catch (e) {}
+  }, []);
 
   const cursorX = Math.max(0, Math.min(ZONE_W / 2 + gyro.x, ZONE_W));
   const cursorY = Math.max(0, Math.min(ZONE_H / 2 + gyro.y, ZONE_H));
@@ -149,6 +182,10 @@ export function GameProvider({ children }) {
     cursorY,
     settings,
     settingsVisible,
+    points,
+    updatePoints,
+    shopLevels,
+    updateShopLevels,
     handleTap,
     resetGame,
     setGameWon,
@@ -159,6 +196,7 @@ export function GameProvider({ children }) {
     closeSettings,
     updateConfig,
     playGlobalMusic: audio.playGlobalMusic, // Expose to screens
+    playVictoryMusic: audio.playVictoryMusic,
     playClick: audio.playClick,
     playMiss: audio.playMiss,
   };

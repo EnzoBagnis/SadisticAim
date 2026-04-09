@@ -34,11 +34,11 @@ import {
 
 function GameScreen({ onGoToCampaign }) {
   const gyro = useGyroscope();
+  const { points, updatePoints, shopLevels, updateShopLevels, openSettings, playClick, playMiss, settingsVisible } = useGame();
+
   const [boost, setBoost] = useState(0);
   const [won, setWon] = useState(false);
   const [showShop, setShowShop] = useState(false);
-  const [points, setPoints] = useState(STARTING_POINTS);
-  const [shopLevels, setShopLevels] = useState({});
 
   const [targetX, setTargetX] = useState(ZONE_W / 2 - TARGET_W / 2);
   const targetXRef = useRef(ZONE_W / 2 - TARGET_W / 2);
@@ -51,10 +51,10 @@ function GameScreen({ onGoToCampaign }) {
 
     const pointsPerSecond = getPassivePoints(passiveLevel);
     const id = setInterval(() => {
-      setPoints((p) => p + pointsPerSecond);
+      updatePoints(points + pointsPerSecond);
     }, 1000);
     return () => clearInterval(id);
-  }, [shopLevels.passivePoints]);
+  }, [shopLevels.passivePoints, points, updatePoints]);
 
   useEffect(() => {
     if (won) return;
@@ -137,19 +137,18 @@ function GameScreen({ onGoToCampaign }) {
        setBoost(0);
        setWon(false);
      }
-     setPoints((currentPoints) => currentPoints + gain);
-   }, [cursorX, cursorY, targetX, boost, won, shopLevels, playClick, playMiss, settingsVisible]);
+     updatePoints(points + gain);
+   }, [cursorX, cursorY, targetX, boost, won, shopLevels, playClick, playMiss, settingsVisible, points, updatePoints]);
 
   const handleBuyUpgrade = useCallback((upgradeId, price) => {
-    setPoints((currentPoints) => {
-      if (currentPoints < price) return currentPoints;
-      setShopLevels((currentLevels) => ({
-        ...currentLevels,
-        [upgradeId]: (currentLevels[upgradeId] ?? 0) + 1,
-      }));
-      return currentPoints - price;
+    if (points < price) return;
+
+    updateShopLevels({
+      ...shopLevels,
+      [upgradeId]: (shopLevels[upgradeId] ?? 0) + 1,
     });
-  }, []);
+    updatePoints(points - price);
+  }, [points, shopLevels, updatePoints, updateShopLevels]);
 
    const adjustedSweetW = getSweetZoneSize(SWEET_W, shopLevels.sweetZoneSize ?? 0);
    const adjustedSweetH = getSweetZoneSize(SWEET_H, shopLevels.sweetZoneSize ?? 0);
@@ -158,7 +157,6 @@ function GameScreen({ onGoToCampaign }) {
    const passivePointsPerSec = shopLevels.passivePoints && shopLevels.passivePoints > 0
      ? getPassivePoints(shopLevels.passivePoints)
      : 0;
-   const { openSettings, playClick, playMiss, settingsVisible } = useGame();
 
    return (
     <TouchableWithoutFeedback onPress={() => { if (!settingsVisible) handleTap(); }} disabled={showShop}>
